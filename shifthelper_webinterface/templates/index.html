@@ -1,40 +1,14 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>FACT ShiftHelper Webinterface</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  </head>
-  <body>
-    <div class=container>
-      <div class=content>
-        <h1>
-          Current Alerts
-        </h1>
-        
-        <table>
-          <tr>
-            <th>timestamp</th>
-            <th>check</th>
-            <th>level</th>
-            <th>title</th>
-            <th>category</th>
-            <th>text</th>
-            <th>id</th>
-          </tr>
-          {% for message in messages %}
-          <tr>
-            <td>{{ message['timestamp'] }}</td>
-            <td>{{ message['check'] }}</td>
-            <td>{{ message['level'] }}</td>
-            <td>{{ message['title'] }}</td>
-            <td>{{ message['category'] }}</td>
-            <td>{{ message['text'] }}</td>
-            <td>{{ message['uuid'] }}</td>
-          </tr>
-          {% endfor %}
-        </table>
-      </div>
+{% extends "layout.html" %}
+{% block content %}
+<div class=container>
+  <div class=content>
+    <h1>
+      Current Alerts
+    </h1>
+    
+    <div id="alerts-panel" >
     </div>
-  </body>
-</html>
-
+  </div>
+</div>
+{% endblock %}
