@@ -68,7 +68,7 @@ var AlertsPanel = React.createClass({
       "div",
       {},
       React.createElement(
-        "table", {"className": "pure-table"},
+        "table", {className: "pure-table", style: {width: "100%"}},
         React.createElement(
           "thead", null,
           React.createElement(
