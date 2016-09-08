@@ -7,8 +7,8 @@ app.messages = []
 
 
 @app.route('/')
-def hello_world():
-    return render_template('messages.html', messages=app.messages)
+def index():
+    return render_template('index.html', messages=app.messages)
 
 
 @app.route('/messages', methods=['GET', 'POST'])
@@ -24,7 +24,3 @@ def messages():
 
     elif request.method == 'GET':
         return jsonify(app.messages)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
