@@ -16,6 +16,7 @@ def remove_alert(uuid):
 
 def update_clients():
     messages = list(app.messages.values())
+    messages.sort(key=lambda m: m['timestamp'], reverse=True)
     socket.emit('update', json.dumps(messages))
 
 
