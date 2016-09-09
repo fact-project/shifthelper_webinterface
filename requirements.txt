@@ -1,0 +1,4 @@
+flask
+flask_login
+flask_ldap3_login
+flask_socketio
