@@ -7,10 +7,12 @@ import logging
 import json
 import os
 
-from .authentication import login_manager, ldap_manager
+from .authentication import login_manager, ldap_manager, basic_auth
 
 app = Flask(__name__)
-app.secret_key = os.environ['FLASK_SECRET_KEY']
+app.secret_key = os.environ['SHIFTHELPER_SECRET_KEY']
+app.config['USERNAME'] = os.environ['SHIFTHELPER_USER']
+app.config['PASSWORD'] = os.environ['SHIFTHELPER_PASSWORD']
 app.alerts = {}
 
 login_manager.init_app(app)
@@ -39,24 +41,30 @@ def index():
     return render_template('index.html', form=form)
 
 
-@app.route('/alerts', methods=['GET', 'POST'])
-def alerts():
-    if request.method == 'POST':
+@app.route('/alerts', methods=['GET'])
+def get_alerts():
+    return jsonify(list(app.alerts.values()))
 
-        alert = request.args.to_dict()
 
-        alert['level'] = logging.getLevelName(int(alert['level']))
-        alert['acknowledged'] = False
+@app.route('/alerts', methods=['POST'])
+@basic_auth.login_required
+def post_alert():
+    alert = request.args.to_dict()
 
-        key = alert['uuid']
-        app.alerts[key] = alert
+    try:
+        level = logging.getLevelName(int(alert['level']))
+    except:
+        level = alert['level']
 
-        update_clients()
+    alert['level'] = level
+    alert['acknowledged'] = False
 
-        return jsonify(status='ok')
+    key = alert['uuid']
+    app.alerts[key] = alert
 
-    elif request.method == 'GET':
-        return jsonify(list(app.alerts.values()))
+    update_clients()
+
+    return jsonify(status='ok')
 
 
 @app.route('/alerts/<uuid>', methods=['PUT', 'DELETE', 'GET'])

@@ -20,14 +20,12 @@
         </div>
         <div class="pure-u-1-2">
         {% if current_user.is_authenticated %}
-        <p>
-          Logged in as: {{ current_user.username }}
           <form action="/logout">
+            Logged in as: {{ current_user.username }}
             <button class="pure-button">
               Logout
             </button>
           </form>
-          </p>
         {% else %}
           <form method="POST" class="pure-form" action="/">
             <label>Username{{ form.username() }}</label>
@@ -35,6 +33,13 @@
             {{ form.submit() }}
             {{ form.hidden_tag() }}
           </form>
+          {% if form.errors %}
+            {% for key, errorlist in form.errors.items() %}
+              {% for error in errorlist%}
+              <span style="color: red;">{{ key }}: {{error}} </span>
+              {% endfor%}
+            {% endfor%}
+          {% endif %}
         {% endif %}
         </div>
       </div>

@@ -1,6 +1,7 @@
 from flask_ldap3_login import LDAP3LoginManager
 from flask_login import LoginManager, UserMixin
-from flask import redirect
+from flask import current_app
+from flask_httpauth import HTTPBasicAuth
 
 users = {}
 
@@ -17,6 +18,7 @@ config = {
 ldap_manager = LDAP3LoginManager()
 ldap_manager.init_config(config)
 login_manager = LoginManager()
+basic_auth = HTTPBasicAuth()
 
 
 class User(UserMixin):
@@ -42,3 +44,11 @@ def save_user(dn, username, data, memberships):
     user = User(dn, username, data)
     users[dn] = user
     return user
+
+
+@basic_auth.get_password
+def get_pw(username):
+    if username == current_app.config['USERNAME']:
+        return current_app.config['PASSWORD']
+    else:
+        return None
