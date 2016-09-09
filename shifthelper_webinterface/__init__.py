@@ -1,12 +1,20 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, redirect
 from flask_socketio import SocketIO
 from flask import request
+from flask_ldap3_login.forms import LDAPLoginForm
+from flask_login import login_user, login_required, logout_user
 import logging
 import json
+import os
+
+from .authentication import login_manager, ldap_manager
 
 app = Flask(__name__)
+app.secret_key = os.environ['FLASK_SECRET_KEY']
 app.alerts = {}
 
+login_manager.init_app(app)
+ldap_manager.init_app(app)
 socket = SocketIO(app)
 
 
@@ -20,10 +28,15 @@ def update_clients():
     socket.emit('update', json.dumps(alerts))
 
 
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
-    update_clients()
-    return render_template('index.html')
+    form = LDAPLoginForm()
+
+    if form.validate_on_submit():
+        login_user(form.user)
+        return redirect('/')
+
+    return render_template('index.html', form=form)
 
 
 @app.route('/alerts', methods=['GET', 'POST'])
@@ -47,6 +60,7 @@ def alerts():
 
 
 @app.route('/alerts/<uuid>', methods=['PUT', 'DELETE', 'GET'])
+@login_required
 def alert(uuid):
 
     if request.method == 'GET':
@@ -70,3 +84,9 @@ def alert(uuid):
             update_clients()
         except KeyError:
             return jsonify(status='No such alert'), 404
+
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect('/')

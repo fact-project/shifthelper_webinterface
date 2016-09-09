@@ -28,12 +28,16 @@ var Alerts = React.createClass({
     $.ajax({
       url: "/alerts/" + uuid,
       type: "PUT",
+      statusCode: {
+        401: function() {
+          alert("You need to login first!");
+        }
+      }
     });
   },
 
   render() {
-    var alertTable;
-    alertTable = this.state.alerts.map((function(_this){
+    var alertTable = this.state.alerts.map((function(_this){
       return function(alert, i) {
         return React.createElement(Alert, {
           "acknowledged": alert.acknowledged,

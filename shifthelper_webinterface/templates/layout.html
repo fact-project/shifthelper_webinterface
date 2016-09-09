@@ -13,8 +13,33 @@
     <title>FACT ShiftHelper Webinterface</title>
   </head>
   <body>
+    <header>
+      <div class="pure-g">
+        <div class="pure-u-1-2">
+          <h1>FACT ShiftHelper Webinterface</h1>
+        </div>
+        <div class="pure-u-1-2">
+        {% if current_user.is_authenticated %}
+        <p>
+          Logged in as: {{ current_user.username }}
+          <form action="/logout">
+            <button class="pure-button">
+              Logout
+            </button>
+          </form>
+          </p>
+        {% else %}
+          <form method="POST" class="pure-form" action="/">
+            <label>Username{{ form.username() }}</label>
+            <label>Password{{ form.password() }}</label>
+            {{ form.submit() }}
+            {{ form.hidden_tag() }}
+          </form>
+        {% endif %}
+        </div>
+      </div>
+    </header>
     <div class="content">
-      <h1>FACT ShiftHelper Webinterface</h1>
       {% block content %}
       {% endblock %}
     </div>
