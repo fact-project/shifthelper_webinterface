@@ -24,19 +24,29 @@ var Alerts = React.createClass({
     return this.setState({alerts: alerts});
   },
 
+  acknowledgeAlert(uuid) {
+    $.ajax({
+      url: "/alerts/" + uuid,
+      type: "PUT",
+    });
+  },
+
   render() {
     var alertTable;
-    alertTable = this.state.alerts.map(function(alert, i) {
-      return React.createElement(Alert, {
-        "acknowledged": alert.acknowledged,
-        "category": alert.category,
-        "check": alert.check,
-        "level": alert.level,
-        "text": alert.text,
-        "timestamp": alert.timestamp,
-        "uuid": alert.uuid
-      });
-    });
+    alertTable = this.state.alerts.map((function(_this){
+      return function(alert, i) {
+        return React.createElement(Alert, {
+          "acknowledged": alert.acknowledged,
+          "category": alert.category,
+          "check": alert.check,
+          "level": alert.level,
+          "text": alert.text,
+          "timestamp": moment(alert.timestamp),
+          "uuid": alert.uuid,
+          "acknowledgeAlert": _this.acknowledgeAlert.bind(_this, alert.uuid)
+        });
+      };
+    })(this));
     return React.createElement(
       ReactCSSTransitionGroup,
       {
@@ -51,12 +61,28 @@ var Alerts = React.createClass({
 
 var Alert = React.createClass({
   render: function() {
+    var button;
+    if (this.props.acknowledged === false){
+      button = React.createElement(
+        "button",
+        {
+          className: "pure-button button-new",
+          "onClick": this.props.acknowledgeAlert
+        },
+        "Got It!"
+      );
+    } else {
+      button = React.createElement(
+        "button", {"className": "pure-button button-acknowledged"}, "Done"
+      );
+    }
     return React.createElement(
       "tr", {},
-      React.createElement('td', null, this.props.timestamp),
+      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD hh:mm:ss')),
       React.createElement('td', null, this.props.check),
       React.createElement('td', null, this.props.level),
-      React.createElement('td', null, this.props.text)
+      React.createElement('td', null, this.props.text),
+      React.createElement('td', null, button)
     );
   }
 });
@@ -76,7 +102,8 @@ var AlertsPanel = React.createClass({
             React.createElement("th", null, "TimeStamp"),
             React.createElement("th", null, "Check"),
             React.createElement("th", null, "Level"),
-            React.createElement("th", null, "Message")
+            React.createElement("th", null, "Message"),
+            React.createElement("th", null, "Acknowledge")
           )
         ),
         React.createElement(Alerts)

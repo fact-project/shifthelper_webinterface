@@ -7,3 +7,11 @@ body {
     margin-left: 10%;
     width: 80%;
 }
+
+.button-acknowledged {
+    background: rgb(28, 184, 65); /* green */
+}
+
+.button-new {
+    background: rgb(202, 60, 60); /* dark red */
+}
