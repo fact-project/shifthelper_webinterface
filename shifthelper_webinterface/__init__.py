@@ -67,17 +67,11 @@ def post_alert():
     return jsonify(status='ok')
 
 
-@app.route('/alerts/<uuid>', methods=['PUT', 'DELETE', 'GET'])
+@app.route('/alerts/<uuid>', methods=['PUT', 'DELETE'])
 @login_required
-def alert(uuid):
+def update_alert(uuid):
 
-    if request.method == 'GET':
-        try:
-            return jsonify(app.alerts[uuid])
-        except KeyError:
-            return jsonify(status='No such alert'), 404
-
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
         try:
             app.alerts[uuid]['acknowledged'] = True
             update_clients()
@@ -92,6 +86,14 @@ def alert(uuid):
             update_clients()
         except KeyError:
             return jsonify(status='No such alert'), 404
+
+
+@app.route('/alerts/<uuid>', methods=['GET'])
+def get_alert(uuid):
+    try:
+        return jsonify(app.alerts[uuid])
+    except KeyError:
+        return jsonify(status='No such alert'), 404
 
 
 @app.route('/logout', methods=['GET', 'POST'])
