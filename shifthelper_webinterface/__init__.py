@@ -1,23 +1,38 @@
-from flask import Flask, jsonify, render_template, redirect
-from flask_socketio import SocketIO
-from flask import request
-from flask_ldap3_login.forms import LDAPLoginForm
-from flask_login import login_user, login_required, logout_user
-import logging
-import json
 import os
+import json
+import logging
+
+from flask import Flask, jsonify, render_template, redirect, request
+from flask_login import login_user, login_required, logout_user, current_user
+from flask_ldap3_login.forms import LDAPLoginForm
+from flask_socketio import SocketIO
+
+from twilio.rest import TwilioRestClient
+from telepot import Bot
 
 from .authentication import login_manager, ldap_manager, basic_auth
+from .communication import (
+    create_mysql_engine, place_call,
+    get_phonenumber, get_telegram_id,
+)
+
+
+with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
+    config = json.load(f)
 
 app = Flask(__name__)
-app.secret_key = os.environ['SHIFTHELPER_SECRET_KEY']
-app.config['USERNAME'] = os.environ['SHIFTHELPER_USER']
-app.config['PASSWORD'] = os.environ['SHIFTHELPER_PASSWORD']
+app.secret_key = config['app']['secret_key']
+app.config['user'] = config['app']['user']
+app.config['password'] = config['app']['password']
 app.alerts = {}
 
 login_manager.init_app(app)
 ldap_manager.init_app(app)
 socket = SocketIO(app)
+
+twillio_client = TwilioRestClient(**config['twilio']['client'])
+database = create_mysql_engine(**config['database'])
+telegram_bot = Bot(config['telegram']['bot_token'])
 
 
 def remove_alert(uuid):
@@ -100,3 +115,20 @@ def get_alert(uuid):
 def logout():
     logout_user()
     return redirect('/')
+
+
+@app.route('/testCall')
+@login_required
+def test_call():
+    phonenumber = get_phonenumber(current_user.username, database)
+    place_call(phonenumber, twillio_client, config['twilio']['number'])
+
+    return "I will call you now."
+
+
+@app.route('/testTelegram')
+@login_required
+def test_telegram():
+    telegram_id = get_telegram_id(current_user.username, database)
+    telegram_bot.sendMessage(telegram_id, 'Hello {}'.format(current_user.username))
+    return "Message sent"
