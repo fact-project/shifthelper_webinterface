@@ -123,7 +123,7 @@ def test_call():
     phonenumber = get_phonenumber(current_user.username, database)
     place_call(phonenumber, twillio_client, config['twilio']['number'])
 
-    return "I will call you now."
+    return render_template('call_placed.html')
 
 
 @app.route('/testTelegram')
@@ -131,4 +131,4 @@ def test_call():
 def test_telegram():
     telegram_id = get_telegram_id(current_user.username, database)
     telegram_bot.sendMessage(telegram_id, 'Hello {}'.format(current_user.username))
-    return "Message sent"
+    return render_template('message_sent.html')
