@@ -14,35 +14,42 @@
   </head>
   <body>
     <header>
-      <div class="pure-g">
-        <div class="pure-u-1-2">
-          <h1>FACT ShiftHelper Webinterface</h1>
-        </div>
-        <div class="pure-u-1-2">
-        {% if current_user.is_authenticated %}
-          <form action="/logout">
-            Logged in as: {{ current_user.username }}
-            <button class="pure-button">
-              Logout
-            </button>
-          </form>
+      <div class="pure-menu pure-menu-horizontal">
+      <a href="/" class="pure-menu-heading pure-menu-link">Home</a>
+      <ul class="pure-menu-list">
+        {% if not current_user.is_authenticated %}
+          <li class="pure-menu-item pure-menu-disabled">Test Call</li>
+          <li class="pure-menu-item pure-menu-disabled">Test Telegram</li>
+          <li class="pure-menu-item">
+            <form method="POST" class="pure-form" action="/">
+              <label>Username{{ form.username() }}</label>
+              <label>Password{{ form.password() }}</label>
+              {{ form.submit() }}
+              {{ form.hidden_tag() }}
+            </form>
+            {% if form.errors %}
+              <span style="color: red;">Invalid username/password </span>
+            {% endif %}
+          </li>
         {% else %}
-          <form method="POST" class="pure-form" action="/">
-            <label>Username{{ form.username() }}</label>
-            <label>Password{{ form.password() }}</label>
-            {{ form.submit() }}
-            {{ form.hidden_tag() }}
-          </form>
-          {% if form.errors %}
-            {% for key, errorlist in form.errors.items() %}
-              {% for error in errorlist%}
-              <span style="color: red;">{{ key }}: {{error}} </span>
-              {% endfor%}
-            {% endfor%}
-          {% endif %}
+          <li class="pure-menu-item ">
+            <a href="/testCall" class="pure-menu-link">Test Call</a>
+          </li>
+          <li class="pure-menu-item ">
+            <a href="/testTelegram" class="pure-menu-link">Test Telegram</a>
+          </li>
+          <li class="pure-menu-item">
+            <form action="/logout">
+              Logged in as: {{ current_user.username }}
+              <button class="pure-button">
+                Logout
+              </button>
+            </form>
+          </li>
         {% endif %}
-        </div>
-      </div>
+      </ul>
+      <div />
+      <h1>FACT ShiftHelper Webinterface</h1>
     </header>
     <div class="content">
       {% block content %}
