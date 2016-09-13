@@ -48,7 +48,7 @@ def save_user(dn, username, data, memberships):
 
 @basic_auth.get_password
 def get_pw(username):
-    if username == current_app.config['USERNAME']:
-        return current_app.config['PASSWORD']
+    if username == current_app.config['user']:
+        return current_app.config['password']
     else:
         return None
