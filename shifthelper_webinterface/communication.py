@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from urllib.parse import urlencode
+from flask_login import current_user
 
 
 def create_mysql_engine(user, password, host, database):
@@ -42,10 +43,16 @@ def build_message_url(message):
     return message_url + '?' + urlencode({'message': message})
 
 
-def place_call(phonenumber, client, from_):
+def place_call(client, from_, database):
+    phonenumber = get_phonenumber(current_user.username, database)
     client.calls.create(
         url=build_message_url('Hello, your test call was successful!'),
         to=phonenumber,
         from_=from_,
         timeout=30,
     )
+
+
+def send_message(bot, database):
+    telegram_id = get_telegram_id(current_user.username, database)
+    bot.sendMessage(telegram_id, 'Hello, {}!'.format(current_user.username))

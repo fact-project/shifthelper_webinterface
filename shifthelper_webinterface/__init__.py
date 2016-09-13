@@ -3,7 +3,7 @@ import json
 import logging
 
 from flask import Flask, jsonify, render_template, redirect, request
-from flask_login import login_user, login_required, logout_user, current_user
+from flask_login import login_user, login_required, logout_user
 from flask_ldap3_login.forms import LDAPLoginForm
 from flask_socketio import SocketIO
 
@@ -11,10 +11,7 @@ from twilio.rest import TwilioRestClient
 from telepot import Bot
 
 from .authentication import login_manager, ldap_manager, basic_auth
-from .communication import (
-    create_mysql_engine, place_call,
-    get_phonenumber, get_telegram_id,
-)
+from .communication import create_mysql_engine, place_call, send_message
 
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
@@ -120,15 +117,12 @@ def logout():
 @app.route('/testCall')
 @login_required
 def test_call():
-    phonenumber = get_phonenumber(current_user.username, database)
-    place_call(phonenumber, twillio_client, config['twilio']['number'])
-
+    place_call(twillio_client, from_=config['twilio']['number'], database=database)
     return render_template('call_placed.html')
 
 
 @app.route('/testTelegram')
 @login_required
 def test_telegram():
-    telegram_id = get_telegram_id(current_user.username, database)
-    telegram_bot.sendMessage(telegram_id, 'Hello {}'.format(current_user.username))
+    send_message(telegram_bot, database=database)
     return render_template('message_sent.html')
