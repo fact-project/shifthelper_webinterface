@@ -4,6 +4,19 @@ var events = new Events();
 
 var socket = io();
 
+function convertLevelToString (level) {
+  var str;
+  switch(level){
+    case 10: str = 'DEBUG'; break;
+    case 20: str = 'INFO'; break;
+    case 30: str = 'WARNING'; break;
+    case 40: str = 'ERROR'; break;
+    case 50: str = 'CRITICAL'; break;
+    default: str = level.toString();
+  }
+  return str;
+}
+
 var Alerts = React.createClass({
 
   getInitialState: function() {
@@ -43,7 +56,7 @@ var Alerts = React.createClass({
           "acknowledged": alert.acknowledged,
           "category": alert.category,
           "check": alert.check,
-          "level": alert.level,
+          "level": convertLevelToString(alert.level),
           "text": alert.text,
           "timestamp": moment(alert.timestamp),
           "uuid": alert.uuid,
@@ -82,7 +95,7 @@ var Alert = React.createClass({
     }
     return React.createElement(
       "tr", {},
-      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD hh:mm:ss')),
+      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')),
       React.createElement('td', null, this.props.check),
       React.createElement('td', null, this.props.level),
       React.createElement('td', null, this.props.text),
