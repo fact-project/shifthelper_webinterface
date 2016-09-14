@@ -10,6 +10,7 @@ from flask_login import current_user
 
 from twilio.rest import TwilioRestClient
 from telepot import Bot
+import peewee
 
 from .authentication import login_manager, ldap_manager, basic_auth
 from .communication import create_mysql_engine, place_call, send_message
@@ -79,15 +80,12 @@ def acknowledge_alert(uuid):
 
 def retrieve_alerts():
     comp_date = datetime.utcnow() - timedelta(hours=24)
-    try:
-        alerts = (
-            Alert
-            .select()
-            .order_by(Alert.timestamp.desc())
-            .where(Alert.timestamp > comp_date)
-        )
-    except Alert.DoesNotExist:
-        return []
+    alerts = (
+        Alert
+        .select()
+        .order_by(Alert.timestamp.desc())
+        .where(Alert.timestamp > comp_date)
+    )
     return [alert.to_dict() for alert in alerts]
 
 
@@ -117,7 +115,11 @@ def get_alerts():
 @basic_auth.login_required
 def post_alert():
     alert = request.args.to_dict()
-    add_alert(alert)
+    try:
+        add_alert(alert)
+    except peewee.InternalError as e:
+        return jsonify(status='Could not add alert', message=str(e)), 422
+
     update_clients()
     return jsonify(status='ok')
 
