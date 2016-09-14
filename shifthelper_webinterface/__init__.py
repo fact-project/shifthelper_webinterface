@@ -139,4 +139,8 @@ def i_am_awake():
 
 @app.route('/iAmAwake', methods=['GET'])
 def who_is_awake():
-    return jsonify(app.users_awake)
+    users_awake = dict(zip(
+        app.users_awake.keys(),
+        map(str, app.users_awake.values())
+    ))
+    return jsonify(users_awake)
