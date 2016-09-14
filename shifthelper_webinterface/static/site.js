@@ -82,7 +82,7 @@ var Alert = React.createClass({
     }
     return React.createElement(
       "tr", {},
-      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD hh:mm:ss')),
+      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')),
       React.createElement('td', null, this.props.check),
       React.createElement('td', null, this.props.level),
       React.createElement('td', null, this.props.text),
