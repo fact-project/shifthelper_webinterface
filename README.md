@@ -7,4 +7,4 @@ The webinterface for the shifthelper
  - clone
  - cd into 
  - `docker build .`
- - `docker run --rm -p 80:5000`
+ - `docker run --rm -p 80:5000 ... and some more which I dont remember`
