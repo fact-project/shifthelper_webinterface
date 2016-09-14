@@ -1,4 +1,5 @@
 import os
+import datetime
 import json
 import logging
 
@@ -13,8 +14,6 @@ from telepot import Bot
 
 from .authentication import login_manager, ldap_manager, basic_auth
 from .communication import create_mysql_engine, place_call, send_message
-
-import datetime
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
     config = json.load(f)
@@ -131,13 +130,13 @@ def test_telegram():
     return render_template('message_sent.html')
 
 
-@app.route('/iAmAwake')
+@app.route('/iAmAwake', methods=['POST'])
 @login_required
 def i_am_awake():
     app.users_awake[current_user.username] = datetime.datetime.utcnow()
     return redirect('/')
 
 
-@app.route('/whoIsAwake')
+@app.route('/iAmAwake', methods=['GET'])
 def who_is_awake():
     return jsonify(app.users_awake)

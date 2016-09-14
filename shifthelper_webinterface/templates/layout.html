@@ -40,8 +40,13 @@
             <a href="/testTelegram" class="pure-menu-link">Test Telegram</a>
           </li>
           <li class="pure-menu-item ">
-            <a href="/iAmAwake" class="pure-menu-link">I am awake</a>
+            <form action="/iAmAwake" method="post">
+                <button class="pure-button">
+                  I am awake
+                </button>
+            </form>
           </li>
+
           <li class="pure-menu-item">
             <form action="/logout">
               Logged in as: {{ current_user.username }}
