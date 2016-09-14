@@ -6,6 +6,7 @@ from flask import Flask, jsonify, render_template, redirect, request
 from flask_login import login_user, login_required, logout_user
 from flask_ldap3_login.forms import LDAPLoginForm
 from flask_socketio import SocketIO
+from flask_login import current_user
 
 from twilio.rest import TwilioRestClient
 from telepot import Bot
@@ -13,6 +14,7 @@ from telepot import Bot
 from .authentication import login_manager, ldap_manager, basic_auth
 from .communication import create_mysql_engine, place_call, send_message
 
+import datetime
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
     config = json.load(f)
@@ -22,6 +24,7 @@ app.secret_key = config['app']['secret_key']
 app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.alerts = {}
+app.users_awake = {}
 
 login_manager.init_app(app)
 ldap_manager.init_app(app)
@@ -126,3 +129,15 @@ def test_call():
 def test_telegram():
     send_message(telegram_bot, database=database)
     return render_template('message_sent.html')
+
+
+@app.route('/iAmAwake')
+@login_required
+def i_am_awake():
+    app.users_awake[current_user.username] = datetime.datetime.utcnow()
+    return redirect('/')
+
+
+@app.route('/whoIsAwake')
+def who_is_awake():
+    return jsonify(app.users_awake)
