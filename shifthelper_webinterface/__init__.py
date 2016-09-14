@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timedelta
 import json
-import logging
 
 from flask import Flask, jsonify, render_template, redirect, request
 from flask_login import login_user, login_required, logout_user
@@ -55,7 +54,6 @@ def _db_close(exc):
 
 
 def remove_alert(uuid):
-    app.alerts.pop(uuid)
     (
         Alert.select()
         .where(Alert.uuid == uuid)
@@ -67,6 +65,16 @@ def add_alert(alert):
 
     alert['acknowledged'] = False
     Alert(**alert).save()
+
+
+def acknowledge_alert(uuid):
+    alert = (
+        Alert.select()
+        .where(Alert.uuid == uuid)
+        .get()
+    )
+    alert.acknowledged = True
+    alert.save()
 
 
 def retrieve_alerts():
@@ -120,10 +128,10 @@ def update_alert(uuid):
 
     if request.method == 'PUT':
         try:
-            app.alerts[uuid]['acknowledged'] = True
+            acknowledge_alert(uuid)
             update_clients()
             return jsonify(status='ok')
-        except KeyError:
+        except Alert.DoesNotExist:
             return jsonify(status='No such alert'), 404
 
     elif request.method == 'DELETE':
@@ -138,8 +146,9 @@ def update_alert(uuid):
 @app.route('/alerts/<uuid>', methods=['GET'])
 def get_alert(uuid):
     try:
-        return jsonify(app.alerts[uuid])
-    except KeyError:
+        alert = Alert.select().where(Alert.uuid == uuid)
+        return jsonify(alert.to_dict())
+    except Alert.DoesNotExist:
         return jsonify(status='No such alert'), 404
 
 
