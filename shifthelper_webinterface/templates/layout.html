@@ -20,6 +20,7 @@
         {% if not current_user.is_authenticated %}
           <li class="pure-menu-item pure-menu-disabled">Test Call</li>
           <li class="pure-menu-item pure-menu-disabled">Test Telegram</li>
+          <li class="pure-menu-item pure-menu-disabled">I am awake</li>
           <li class="pure-menu-item">
             <form method="POST" class="pure-form" action="/">
               <label>Username{{ form.username() }}</label>
@@ -38,6 +39,14 @@
           <li class="pure-menu-item ">
             <a href="/testTelegram" class="pure-menu-link">Test Telegram</a>
           </li>
+          <li class="pure-menu-item ">
+            <form action="/iAmAwake" method="post">
+                <button class="pure-button">
+                  I am awake
+                </button>
+            </form>
+          </li>
+
           <li class="pure-menu-item">
             <form action="/logout">
               Logged in as: {{ current_user.username }}
@@ -48,7 +57,7 @@
           </li>
         {% endif %}
       </ul>
-      <div />
+      </div>
       <h1>FACT ShiftHelper Webinterface</h1>
     </header>
     <div class="content">
