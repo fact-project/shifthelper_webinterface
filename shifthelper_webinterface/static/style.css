@@ -15,3 +15,7 @@ body {
 .button-new {
     background: rgb(202, 60, 60); /* dark red */
 }
+
+.margins {
+  margin: 0.2ex 0.5em 0.2ex 0.5em;
+}

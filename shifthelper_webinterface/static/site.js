@@ -68,8 +68,9 @@ var Alerts = React.createClass({
       ReactCSSTransitionGroup,
       {
         "transitionName": "alerts",
-        "component": "tbody",
+        "component": "ul",
         "id": "alerts-table",
+        "className": "list-group"
       },
       alertTable
     );
@@ -83,23 +84,36 @@ var Alert = React.createClass({
       button = React.createElement(
         "button",
         {
-          className: "pure-button button-new",
+          className: "btn btn-danger btn-sm",
           "onClick": this.props.acknowledgeAlert
         },
-        "Got It!"
+        "Acknowledge"
       );
     } else {
       button = React.createElement(
-        "button", {"className": "pure-button button-acknowledged"}, "Done"
+        "button", {"className": "btn btn-success btn-sm"}, "Done"
       );
     }
     return React.createElement(
-      "tr", {},
-      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')),
-      React.createElement('td', null, this.props.check),
-      React.createElement('td', null, this.props.level),
-      React.createElement('td', null, this.props.text),
-      React.createElement('td', null, button)
+      "li",
+      {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
+      React.createElement(
+        "span", {"className": "pull-left"},
+        React.createElement(
+          "span", { "className": "badge"},
+          this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
+        ),
+        React.createElement("span", {"className":"margins"}, this.props.check),
+        React.createElement("span", {"className":"margins"}, this.props.level),
+        React.createElement("span", {"className":"margins"}, this.props.text)
+      ),
+      React.createElement(
+        "span", {"className": "pull-right"},
+        React.createElement(
+          "div", {"className": "btn-group"},
+          button
+        )
+      )
     );
   }
 });
@@ -109,22 +123,13 @@ var AlertsPanel = React.createClass({
   render: function() {
     return React.createElement(
       "div",
-      {},
+      {"className": "panel panel-default"},
       React.createElement(
-        "table", {className: "pure-table", style: {width: "100%"}},
-        React.createElement(
-          "thead", null,
-          React.createElement(
-            "tr", null,
-            React.createElement("th", null, "TimeStamp"),
-            React.createElement("th", null, "Check"),
-            React.createElement("th", null, "Level"),
-            React.createElement("th", null, "Message"),
-            React.createElement("th", null, "Acknowledge")
-          )
-        ),
-        React.createElement(Alerts)
-      )
+        "div",
+        {"className": "panel-heading"},
+        React.createElement("h3", { "className": "panel-title" }, "Current Alerts")
+      ),
+      React.createElement(Alerts, null)
     );
   }
 });
