@@ -97,22 +97,17 @@ var Alert = React.createClass({
     return React.createElement(
       "li",
       {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
-      React.createElement(
-        "span", {"className": "pull-left"},
-        React.createElement(
-          "span", { "className": "badge"},
-          this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
+      React.createElement("div", {"className": "row"},
+        React.createElement("div", {"className": "col-md-2"},
+          React.createElement(
+            "span", { "className": "badge"},
+            this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
+          )
         ),
-        React.createElement("span", {"className":"margins"}, this.props.check),
-        React.createElement("span", {"className":"margins"}, this.props.level),
-        React.createElement("span", {"className":"margins"}, this.props.text)
-      ),
-      React.createElement(
-        "span", {"className": "pull-right"},
-        React.createElement(
-          "div", {"className": "btn-group"},
-          button
-        )
+        React.createElement("div", {"className": "col-md-2"}, this.props.check),
+        React.createElement("div", {"className": "col-md-2"}, this.props.level),
+        React.createElement("div", {"className": "col-md-5"}, this.props.text),
+        React.createElement("div", {"className": "col-md-1"}, button)
       )
     );
   }
