@@ -1,63 +1,60 @@
 <!DOCTYPE html>
 <html>
-  <head lang="en">
-    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/pure-min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='vendor/jquery.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/react-with-addons.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/minivents.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/socket.io.js') }}"></script>
-    <script src="{{ url_for('static', filename='vendor/moment.min.js') }}"></script>
-
-    <meta charset="UTF-8">
-    <title>FACT ShiftHelper Webinterface</title>
-  </head>
+  {% include 'head.html' %}
   <body>
     <header>
-      <div class="pure-menu pure-menu-horizontal">
-      <a href="/" class="pure-menu-heading pure-menu-link">Home</a>
-      <ul class="pure-menu-list">
-        {% if not current_user.is_authenticated %}
-          <li class="pure-menu-item pure-menu-disabled">Test Call</li>
-          <li class="pure-menu-item pure-menu-disabled">Test Telegram</li>
-          <li class="pure-menu-item pure-menu-disabled">I am awake</li>
-          <li class="pure-menu-item">
-            <form method="POST" class="pure-form" action="/">
-              <label>Username{{ form.username() }}</label>
-              <label>Password{{ form.password() }}</label>
-              {{ form.submit() }}
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Home</a>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            {% if not current_user.is_authenticated %}
+            <ul class="nav navbar-nav">
+              <li class="disabled"><a href="#">Test Call</a></li>
+              <li class="disabled"><a href="#">Test Telegram</a></li>
+              <li class="disabled"><a href="#">I am awake</a></li>
+            </ul>
+            <form method="POST" action="/" class="navbar-form">
+              <div class="form-group">
+                <input id="username" class="form-control" name="username" type="text" value placeholder="username">
+                <input id="password" class="form-control" name="password" type="password" value placeholder="password">
+              </div>
+              <button type="submit" class="btn btn-default">Login</button>
               {{ form.hidden_tag() }}
             </form>
-            {% if form.errors %}
-              <span style="color: red;">Invalid username/password </span>
+            {% else %}
+            <ul class="nav navbar-nav">
+              <li><a href="/testCall">Test Call</a></li>
+              <li><a href="/testTelegram">Test Telegram</a></li>
+              <li>
+                <form action="/iAmAwake" method="POST" class="navbar-form">
+                  <button class="btn btn-default">
+                    I am awake
+                  </button>
+                </form>
+              </li>
+              <li>
+                <form action="/logout" class="navbar-form">
+                  <button class="btn btn-default">
+                    Logout
+                  </button>
+                </form>
+              </li>
+            </ul>
             {% endif %}
-          </li>
-        {% else %}
-          <li class="pure-menu-item ">
-            <a href="/testCall" class="pure-menu-link">Test Call</a>
-          </li>
-          <li class="pure-menu-item ">
-            <a href="/testTelegram" class="pure-menu-link">Test Telegram</a>
-          </li>
-          <li class="pure-menu-item ">
-            <form action="/iAmAwake" method="post">
-                <button class="pure-button">
-                  I am awake
-                </button>
-            </form>
-          </li>
-
-          <li class="pure-menu-item">
-            <form action="/logout">
-              Logged in as: {{ current_user.username }}
-              <button class="pure-button">
-                Logout
-              </button>
-            </form>
-          </li>
-        {% endif %}
-      </ul>
-      </div>
+          </div>
+        </div>
+      </nav>
+      {% if form.errors %}
+        <span style="color: red;">Invalid username/password </span>
+      {% endif %}
       <h1>FACT ShiftHelper Webinterface</h1>
     </header>
     <div class="content">
