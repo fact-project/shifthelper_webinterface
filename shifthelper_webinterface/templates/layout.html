@@ -53,12 +53,17 @@
           </div>
         </div>
       </nav>
-      {% if form.errors %}
-        <span style="color: red;">Invalid username/password </span>
-      {% endif %}
       <h1>FACT ShiftHelper Webinterface</h1>
     </header>
     <div class="content">
+      {% if form.errors %}
+      <div class="alert alert-danger alert-dismissible" style="width: 80%; margin-left: 10%;">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+          &times;
+        </button>
+        <strong>Invalid username and/or password</strong>
+      </div>
+      {% endif %}
       {% block content %}
       {% endblock %}
     </div>

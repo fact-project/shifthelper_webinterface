@@ -43,7 +43,10 @@ var Alerts = React.createClass({
       type: "PUT",
       statusCode: {
         401: function() {
-          alert("You need to login first!");
+          div = $('<div>', {"class": 'alert alert-danger alert-dismissable'});
+          div.html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>');
+          div.append($('<strong>').text('You need to login first!'));
+          return $('#alerts-panel').before(div);
         }
       }
     });
@@ -99,13 +102,13 @@ var Alert = React.createClass({
       {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
       React.createElement("div", {"className": "row"},
         React.createElement(
-          "div", {"className": "col-md-2 col-xs-4"},
+          "div", {"className": "col-md-3 col-xs-4"},
           this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
         ),
-        React.createElement("div", {"className": "col-md-2 col-xs-4"}, this.props.check),
-        React.createElement("div", {"className": "col-md-2 col-xs-4"}, this.props.level),
-        React.createElement("div", {"className": "col-md-4 col-xs-6"}, this.props.text),
-        React.createElement("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
+        React.createElement("div", {"className": "col-md-2 col-xs-3"}, this.props.check),
+        React.createElement("div", {"className": "col-md-1 col-xs-3"}, this.props.level),
+        React.createElement("div", {"className": "col-md-4 col-xs-8 text-right"}, this.props.text),
+        React.createElement("div", {"className": "col-md-2 col-xs-2 text-right pull-right"}, button)
       )
     );
   }
