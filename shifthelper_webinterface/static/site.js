@@ -98,16 +98,14 @@ var Alert = React.createClass({
       "li",
       {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
       React.createElement("div", {"className": "row"},
-        React.createElement("div", {"className": "col-md-2"},
-          React.createElement(
-            "span", { "className": "badge"},
-            this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
-          )
+        React.createElement(
+          "div", {"className": "col-md-2 col-xs-4"},
+          this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
         ),
-        React.createElement("div", {"className": "col-md-2"}, this.props.check),
-        React.createElement("div", {"className": "col-md-2"}, this.props.level),
-        React.createElement("div", {"className": "col-md-5"}, this.props.text),
-        React.createElement("div", {"className": "col-md-1"}, button)
+        React.createElement("div", {"className": "col-md-2 col-xs-4"}, this.props.check),
+        React.createElement("div", {"className": "col-md-2 col-xs-4"}, this.props.level),
+        React.createElement("div", {"className": "col-md-4 col-xs-6"}, this.props.text),
+        React.createElement("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
       )
     );
   }
