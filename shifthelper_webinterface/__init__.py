@@ -63,7 +63,6 @@ def remove_alert(uuid):
 
 
 def add_alert(alert):
-
     alert['acknowledged'] = False
     Alert(**alert).save()
 
@@ -163,15 +162,25 @@ def logout():
 @app.route('/testCall')
 @login_required
 def test_call():
-    place_call(twillio_client, from_=config['twilio']['number'], database=fact_database)
-    return render_template('call_placed.html')
+    try:
+        place_call(
+            twillio_client,
+            from_=config['twilio']['number'],
+            database=fact_database
+        )
+        return render_template('call_placed.html', success=True)
+    except ValueError:
+        return render_template('call_placed.html', success=False)
 
 
 @app.route('/testTelegram')
 @login_required
 def test_telegram():
-    send_message(telegram_bot, database=fact_database)
-    return render_template('message_sent.html')
+    try:
+        send_message(telegram_bot, database=fact_database)
+        return render_template('message_sent.html', success=True)
+    except ValueError:
+        return render_template('message_sent.html', success=False)
 
 
 @app.route('/iAmAwake', methods=['POST'])

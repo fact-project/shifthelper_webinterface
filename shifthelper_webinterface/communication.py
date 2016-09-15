@@ -45,14 +45,20 @@ def build_message_url(message):
 
 def place_call(client, from_, database):
     phonenumber = get_phonenumber(current_user.username, database)
-    client.calls.create(
-        url=build_message_url('Hello, your test call was successful!'),
-        to=phonenumber,
-        from_=from_,
-        timeout=30,
-    )
+    if phonenumber:
+        client.calls.create(
+            url=build_message_url('Hello, your test call was successful!'),
+            to=phonenumber,
+            from_=from_,
+            timeout=30,
+        )
+    else:
+        raise ValueError('Shifter has no phone number')
 
 
 def send_message(bot, database):
     telegram_id = get_telegram_id(current_user.username, database)
-    bot.sendMessage(telegram_id, 'Hello, {}!'.format(current_user.username))
+    if telegram_id:
+        bot.sendMessage(telegram_id, 'Hello, {}!'.format(current_user.username))
+    else:
+        raise ValueError('Shifter has no telegram id')
