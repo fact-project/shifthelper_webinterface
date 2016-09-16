@@ -96,7 +96,6 @@ def update_clients():
 @app.route('/', methods=["GET", "POST"])
 def index():
     form = LDAPLoginForm()
-
     if form.validate_on_submit():
         login_user(form.user)
         return redirect('/')
@@ -162,25 +161,35 @@ def logout():
 @app.route('/testCall')
 @login_required
 def test_call():
+    form = LDAPLoginForm()
+    if form.validate_on_submit():
+        login_user(form.user)
+        return redirect('/')
+
     try:
         place_call(
             twillio_client,
             from_=config['twilio']['number'],
             database=fact_database
         )
-        return render_template('call_placed.html', success=True)
+        return render_template('call_placed.html', success=True, form=form)
     except ValueError:
-        return render_template('call_placed.html', success=False)
+        return render_template('call_placed.html', success=False, form=form)
 
 
 @app.route('/testTelegram')
 @login_required
 def test_telegram():
+    form = LDAPLoginForm()
+    if form.validate_on_submit():
+        login_user(form.user)
+        return redirect('/')
+
     try:
         send_message(telegram_bot, database=fact_database)
-        return render_template('message_sent.html', success=True)
+        return render_template('message_sent.html', success=True, form=form)
     except ValueError:
-        return render_template('message_sent.html', success=False)
+        return render_template('message_sent.html', success=False, form=form)
 
 
 @app.route('/iAmAwake', methods=['POST'])

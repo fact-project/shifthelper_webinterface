@@ -43,7 +43,10 @@ var Alerts = React.createClass({
       type: "PUT",
       statusCode: {
         401: function() {
-          alert("You need to login first!");
+          div = $('<div>', {"class": 'alert alert-danger alert-dismissable'});
+          div.html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>');
+          div.append($('<strong>').text('You need to login first!'));
+          return $('#alerts-panel').before(div);
         }
       }
     });
@@ -68,8 +71,9 @@ var Alerts = React.createClass({
       ReactCSSTransitionGroup,
       {
         "transitionName": "alerts",
-        "component": "tbody",
+        "component": "ul",
         "id": "alerts-table",
+        "className": "list-group"
       },
       alertTable
     );
@@ -83,23 +87,29 @@ var Alert = React.createClass({
       button = React.createElement(
         "button",
         {
-          className: "pure-button button-new",
+          className: "btn btn-danger btn-sm",
           "onClick": this.props.acknowledgeAlert
         },
-        "Got It!"
+        "Acknowledge"
       );
     } else {
       button = React.createElement(
-        "button", {"className": "pure-button button-acknowledged"}, "Done"
+        "button", {"className": "btn btn-success btn-sm"}, "Done"
       );
     }
     return React.createElement(
-      "tr", {},
-      React.createElement('td', null, this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')),
-      React.createElement('td', null, this.props.check),
-      React.createElement('td', null, this.props.level),
-      React.createElement('td', null, this.props.text),
-      React.createElement('td', null, button)
+      "li",
+      {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
+      React.createElement("div", {"className": "row"},
+        React.createElement(
+          "div", {"className": "col-md-3 col-xs-6 date"},
+          this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
+        ),
+        React.createElement("div", {"className": "col-md-2 col-xs-6 check"}, this.props.check),
+        React.createElement("div", {"className": "col-md-1 col-xs-6 level"}, this.props.level),
+        React.createElement("div", {"className": "col-md-4 col-xs-12"}, this.props.text),
+        React.createElement("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
+      )
     );
   }
 });
@@ -109,22 +119,13 @@ var AlertsPanel = React.createClass({
   render: function() {
     return React.createElement(
       "div",
-      {},
+      {"className": "panel panel-default"},
       React.createElement(
-        "table", {className: "pure-table", style: {width: "100%"}},
-        React.createElement(
-          "thead", null,
-          React.createElement(
-            "tr", null,
-            React.createElement("th", null, "TimeStamp"),
-            React.createElement("th", null, "Check"),
-            React.createElement("th", null, "Level"),
-            React.createElement("th", null, "Message"),
-            React.createElement("th", null, "Acknowledge")
-          )
-        ),
-        React.createElement(Alerts)
-      )
+        "div",
+        {"className": "panel-heading"},
+        React.createElement("h3", { "className": "panel-title" }, "Current Alerts")
+      ),
+      React.createElement(Alerts, null)
     );
   }
 });
