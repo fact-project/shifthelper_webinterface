@@ -2,9 +2,8 @@ import os
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, jsonify, render_template, redirect, request
+from flask import Flask, jsonify, render_template, redirect, request, flash
 from flask_login import login_user, login_required, logout_user
-from flask_ldap3_login.forms import LDAPLoginForm
 from flask_socketio import SocketIO
 from flask_login import current_user
 
@@ -12,9 +11,10 @@ from twilio.rest import TwilioRestClient
 from telepot import Bot
 import peewee
 
-from .authentication import login_manager, ldap_manager, basic_auth
+from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database
+
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
     config = json.load(f)
@@ -26,7 +26,6 @@ app.config['password'] = config['app']['password']
 app.users_awake = {}
 
 login_manager.init_app(app)
-ldap_manager.init_app(app)
 socket = SocketIO(app)
 
 twillio_client = TwilioRestClient(**config['twilio']['client'])
@@ -95,12 +94,7 @@ def update_clients():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    form = LDAPLoginForm()
-    if form.validate_on_submit():
-        login_user(form.user)
-        return redirect('/')
-
-    return render_template('index.html', form=form)
+    return render_template('index.html')
 
 
 @app.route('/alerts', methods=['GET'])
@@ -152,6 +146,24 @@ def get_alert(uuid):
         return jsonify(status='No such alert'), 404
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return redirect('/')
+
+    username = request.form['username']
+    password = request.form['password']
+
+    user = authenticate_user(username, password)
+
+    if user is not None:
+        login_user(user)
+        return redirect('/')
+    else:
+        flash('Wrong username/password', 'alert-danger')
+        return redirect('/')
+
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
@@ -161,35 +173,25 @@ def logout():
 @app.route('/testCall')
 @login_required
 def test_call():
-    form = LDAPLoginForm()
-    if form.validate_on_submit():
-        login_user(form.user)
-        return redirect('/')
-
     try:
         place_call(
             twillio_client,
             from_=config['twilio']['number'],
             database=fact_database
         )
-        return render_template('call_placed.html', success=True, form=form)
+        return render_template('call_placed.html', success=True)
     except ValueError:
-        return render_template('call_placed.html', success=False, form=form)
+        return render_template('call_placed.html', success=False)
 
 
 @app.route('/testTelegram')
 @login_required
 def test_telegram():
-    form = LDAPLoginForm()
-    if form.validate_on_submit():
-        login_user(form.user)
-        return redirect('/')
-
     try:
         send_message(telegram_bot, database=fact_database)
-        return render_template('message_sent.html', success=True, form=form)
+        return render_template('message_sent.html', success=True)
     except ValueError:
-        return render_template('message_sent.html', success=False, form=form)
+        return render_template('message_sent.html', success=False)
 
 
 @app.route('/iAmAwake', methods=['POST'])
