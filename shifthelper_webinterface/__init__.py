@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, jsonify, render_template, redirect, request, flash
+from flask import Flask, jsonify, render_template, redirect, request, flash, Markup
 from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
@@ -179,9 +179,11 @@ def test_call():
             from_=config['twilio']['number'],
             database=fact_database
         )
-        return render_template('call_placed.html', success=True)
+        flash('I will call you now', 'alert-success')
+        return redirect('/')
     except ValueError:
-        return render_template('call_placed.html', success=False)
+        flash(Markup(render_template('call_failed.html')), 'alert-danger')
+        return redirect('/')
 
 
 @app.route('/testTelegram')
@@ -189,9 +191,11 @@ def test_call():
 def test_telegram():
     try:
         send_message(telegram_bot, database=fact_database)
-        return render_template('message_sent.html', success=True)
+        flash('I send you a message', 'alert-success')
+        return redirect('/')
     except ValueError:
-        return render_template('message_sent.html', success=False)
+        flash(Markup(render_template('telegram_failed.html')), 'alert-danger')
+        return redirect('/')
 
 
 @app.route('/iAmAwake', methods=['POST'])
