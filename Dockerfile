@@ -12,7 +12,7 @@ ENV LC_ALL="en_US.UTF-8"
 ENV LANG="en_US.UTF-8"
 
 
-RUN conda install -y -q flask pandas pymysql sqlalchemy \
+RUN conda install -y -q flask pandas pymysql sqlalchemy requests \
   && conda install -y -q -c conda-forge uwsgi \
   && pip install flask_login flask_ldap3_login flask_socketio \
   twilio telepot flask_httpauth peewee eventlet
