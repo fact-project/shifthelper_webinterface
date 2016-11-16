@@ -9,6 +9,7 @@ from flask_login import current_user
 
 from twilio.rest import TwilioRestClient
 from telepot import Bot
+from telepot.exception import TelegramError
 import peewee
 
 from .authentication import login_manager, basic_auth, authenticate_user
@@ -195,6 +196,9 @@ def test_telegram():
         return redirect('/')
     except ValueError:
         flash(Markup(render_template('telegram_failed.html')), 'alert-danger')
+        return redirect('/')
+    except TelegramError:
+        flash(Markup(render_template('telegram_new_user.html')), 'alert-danger')
         return redirect('/')
 
 
