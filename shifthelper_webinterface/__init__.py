@@ -106,7 +106,7 @@ def get_alerts():
 @app.route('/alerts', methods=['POST'])
 @basic_auth.login_required
 def post_alert():
-    alert = request.args.to_dict()
+    alert = request.json
     try:
         add_alert(alert)
     except peewee.InternalError as e:
