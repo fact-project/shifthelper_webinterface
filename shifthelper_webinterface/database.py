@@ -1,6 +1,6 @@
 from peewee import (
     MySQLDatabase, Model,
-    CharField, DateTimeField, IntegerField, UUIDField, BooleanField,
+    CharField, DateTimeField, IntegerField, UUIDField, BooleanField, TextField
 )
 from playhouse.shortcuts import model_to_dict
 
@@ -10,7 +10,7 @@ database = MySQLDatabase(None)
 
 
 class Alert(Model):
-    text = CharField()
+    text = TextField()
     timestamp = DateTimeField()
     level = IntegerField()
     uuid = UUIDField()
