@@ -182,7 +182,7 @@ def test_call():
         )
         flash('I will call you now', 'alert-success')
         return redirect('/')
-    except ValueError:
+    except (ValueError, IndexError):
         flash(Markup(render_template('call_failed.html')), 'alert-danger')
         return redirect('/')
 
@@ -194,7 +194,7 @@ def test_telegram():
         send_message(telegram_bot, database=fact_database)
         flash('I send you a message', 'alert-success')
         return redirect('/')
-    except ValueError:
+    except (ValueError, IndexError):
         flash(Markup(render_template('telegram_failed.html')), 'alert-danger')
         return redirect('/')
     except TelegramError:
