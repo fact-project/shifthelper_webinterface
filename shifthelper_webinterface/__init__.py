@@ -7,7 +7,7 @@ from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
 
-from twilio.rest import TwilioRestClient
+from twilio.rest import TwilioRestClient, TwilioRestException
 from telepot import Bot
 from telepot.exception import TelegramError
 import peewee
@@ -183,6 +183,9 @@ def test_call():
         flash('I will call you now', 'alert-success')
         return redirect('/')
     except (ValueError, IndexError):
+        flash(Markup(render_template('no_number.html')), 'alert-danger')
+        return redirect('/')
+    except TwilioRestException:
         flash(Markup(render_template('call_failed.html')), 'alert-danger')
         return redirect('/')
 
