@@ -141,7 +141,7 @@ def update_alert(uuid):
 @app.route('/alerts/<uuid>', methods=['GET'])
 def get_alert(uuid):
     try:
-        alert = Alert.select().where(Alert.uuid == uuid)
+        alert = Alert.get(uuid=uuid)
         return jsonify(alert.to_dict())
     except Alert.DoesNotExist:
         return jsonify(status='No such alert'), 404
