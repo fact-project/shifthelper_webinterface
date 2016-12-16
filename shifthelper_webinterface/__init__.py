@@ -26,6 +26,7 @@ app.secret_key = config['app']['secret_key']
 app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.users_awake = {}
+app.dummy_alerts = {}
 
 login_manager.init_app(app)
 socket = SocketIO(app)
@@ -220,3 +221,20 @@ def who_is_awake():
         map(str, app.users_awake.values())
     ))
     return jsonify(users_awake)
+
+
+
+@app.route('/placeDummyAlert', methods=['POST'])
+@login_required
+def i_am_awake():
+    app.dummy_alerts[current_user.username] = datetime.utcnow()
+    return redirect('/')
+
+
+@app.route('/placeDummyAlert', methods=['GET'])
+def who_is_awake():
+    dummy_alerts = dict(zip(
+        app.dummy_alerts.keys(),
+        map(str, app.dummy_alerts.values())
+    ))
+    return jsonify(dummy_alerts)
