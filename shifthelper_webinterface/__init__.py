@@ -224,14 +224,14 @@ def who_is_awake():
 
 
 
-@app.route('/placeDummyAlert', methods=['POST'])
+@app.route('/dummyAlert', methods=['POST'])
 @login_required
 def i_am_awake():
     app.dummy_alerts[current_user.username] = datetime.utcnow()
     return redirect('/')
 
 
-@app.route('/placeDummyAlert', methods=['GET'])
+@app.route('/dummyAlert', methods=['GET'])
 def who_is_awake():
     dummy_alerts = dict(zip(
         app.dummy_alerts.keys(),
