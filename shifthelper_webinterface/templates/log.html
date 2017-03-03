@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "layout.html" %}
+{% block content %}
+<div class=container>
+  <div class=content>
+    <pre id="log"> </>
+  </div>
+</div>
+
+<script charset="utf-8">
+    var log = document.getElementById('log')
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '{{ url_for('logstream') }}');
+    xhr.send();
+
+    window.setInterval(function(){
+      console.log(xhr.responseText)
+      log.innerHTML = xhr.responseText;
+    }, 1000)
+</script>
+{% endblock %}
+

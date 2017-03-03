@@ -17,6 +17,7 @@
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             {% if not current_user.is_authenticated %}
             <ul class="nav navbar-nav">
+              <li class="disabled"><a href="#">Logs</a></li>
               <li class="disabled"><a href="#">Test Call</a></li>
               <li class="disabled"><a href="#">Test Telegram</a></li>
               <li class="disabled"><a href="#">I am awake</a></li>
@@ -30,6 +31,7 @@
             </form>
             {% else %}
             <ul class="nav navbar-nav">
+              <li><a href="/log">Logs</a></li>
               <li><a href="/testCall">Test Call</a></li>
               <li><a href="/testTelegram">Test Telegram</a></li>
               <li>
