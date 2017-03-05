@@ -123,7 +123,7 @@ def logstream():
             while True:
                 text = f.read()
                 if first:
-                    yield '\n'.join(text.splitlines()[-100:])
+                    text = '\n'.join(text.splitlines()[-100:]) + '\n'
                     first = False
                 yield text
                 sleep(1)
