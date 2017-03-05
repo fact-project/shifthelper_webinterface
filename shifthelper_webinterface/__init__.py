@@ -114,7 +114,7 @@ def log():
     return render_template('log.html')
 
 
-@app.route('/logstrem')
+@app.route('/logstream')
 @login_required
 def logstream():
     def generate():
