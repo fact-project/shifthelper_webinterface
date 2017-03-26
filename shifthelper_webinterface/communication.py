@@ -13,7 +13,7 @@ def create_mysql_engine(user, password, host, database):
 
 
 def get_telegram_id(username, database):
-    telephone_query = (
+    telegram_query = (
         'SELECT fid9 AS telegram_id'
         ' FROM users'
         ' JOIN userfields'
@@ -22,7 +22,8 @@ def get_telegram_id(username, database):
         ' ;'
     ).format(username=username)
 
-    return pd.read_sql_query(telephone_query, database).iloc[0]['telegram_id']
+    with database.connect() as conn:
+        return pd.read_sql_query(telegram_query, conn).iloc[0]['telegram_id']
 
 
 def get_phonenumber(username, database):
@@ -35,7 +36,8 @@ def get_phonenumber(username, database):
         ' ;'
     ).format(username=username)
 
-    return pd.read_sql_query(telephone_query, database).iloc[0]['phonenumber']
+    with database.connect() as conn:
+        return pd.read_sql_query(telephone_query, conn).iloc[0]['phonenumber']
 
 
 def build_message_url(message):
