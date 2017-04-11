@@ -105,9 +105,10 @@ def get_alerts():
     alerts = retrieve_alerts()
     return jsonify(alerts)
 
+
 @app.route('/time', methods=['GET'])
 def get_time():
-    return jsonify({'time':datetime.utcnow()})
+    return jsonify({'time': datetime.utcnow().isoformat()})
 
 
 @app.route('/alerts', methods=['POST'])
