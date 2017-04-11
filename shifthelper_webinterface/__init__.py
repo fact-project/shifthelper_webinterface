@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, jsonify, render_template, redirect, request, flash, Markup
+from flask import Flask, jsonify, render_template, redirect, request, flash, Markup, Response
 from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
@@ -11,11 +11,18 @@ from twilio.rest import TwilioRestClient
 from twilio.exceptions import TwilioException
 from telepot import Bot
 from telepot.exception import TelegramError
+from time import sleep
 import peewee
+import eventlet
+
+import subprocess as sp
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database
+
+
+eventlet.monkey_patch()
 
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
@@ -27,6 +34,7 @@ app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.users_awake = {}
 app.dummy_alerts = {}
+app.config['shifthelper_log'] = config['app']['shifthelper_log']
 
 login_manager.init_app(app)
 socket = SocketIO(app)
@@ -98,6 +106,29 @@ def update_clients():
 @app.route('/', methods=["GET", "POST"])
 def index():
     return render_template('index.html')
+
+
+@app.route('/log')
+@login_required
+def log():
+    return render_template('log.html')
+
+
+@app.route('/logstream')
+@login_required
+def logstream():
+    def generate():
+        first = True
+        with open(app.config['shifthelper_log']) as f:
+            while True:
+                text = f.read()
+                if first:
+                    text = '\n'.join(text.splitlines()[-100:]) + '\n'
+                    first = False
+                yield text
+                sleep(1)
+
+    return Response(generate())
 
 
 @app.route('/alerts', methods=['GET'])

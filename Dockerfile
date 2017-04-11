@@ -15,7 +15,8 @@ ENV LANG="en_US.UTF-8"
 RUN conda install -y -q flask pandas pymysql sqlalchemy requests \
   && conda install -y -q -c conda-forge uwsgi \
   && pip install flask_login flask_ldap3_login flask_socketio \
-  twilio telepot flask_httpauth peewee eventlet
+  twilio telepot flask_httpauth peewee eventlet \
+  gunicorn
 
 RUN rm /etc/nginx/sites-enabled/default
 COPY nginx.conf /etc/nginx/conf.d/shifthelper_nginx.conf
