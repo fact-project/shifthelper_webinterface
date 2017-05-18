@@ -9,7 +9,7 @@ def create_mysql_engine(user, password, host, database):
         'mysql+pymysql://{user}:{password}@{host}/{database}'.format(
             user=user, password=password, host=host, database=database
         ),
-        pool_pre_ping=True,  # try if mysql connection is still valid, else reconnect
+        pool_recycle=3600,  # get rid of old connections
     )
 
 
