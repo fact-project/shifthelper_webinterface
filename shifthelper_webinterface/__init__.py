@@ -34,6 +34,7 @@ app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.users_awake = {}
 app.dummy_alerts = {}
+app.last_time_shifthelper_online = None
 app.config['shifthelper_log'] = config['app']['shifthelper_log']
 
 login_manager.init_app(app)
@@ -105,7 +106,11 @@ def update_clients():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
+    if app.last_time_shifthelper_online is None:
+        last_time_shifthelper_online_str = ""
+    else:
+        last_time_shifthelper_online_str = str(app.last_time_shifthelper_online)
+    return render_template('index.html', last_time_shifthelper_online_str=last_time_shifthelper_online_str)
 
 
 @app.route('/log')
@@ -254,7 +259,6 @@ def who_is_awake():
     return jsonify(users_awake)
 
 
-
 @app.route('/dummyAlert', methods=['POST'])
 @login_required
 def post_dummy_alert():
@@ -269,3 +273,14 @@ def get_dummy_alert():
         map(str, app.dummy_alerts.values())
     ))
     return jsonify(dummy_alerts)
+
+
+@app.route('/shifthelperOnline', methods=['POST'])
+@login_required
+def update_shifthelper_online_time():
+    app.last_time_shifthelper_online = datetime.utcnow()
+    return jsonify(status='ok')
+
+@app.route('/shifthelperOnline', methods=['GET'])
+def get_shifthelper_online_time():
+    return jsonify(app.last_time_shifthelper_online)
