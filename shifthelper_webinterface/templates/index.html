@@ -8,4 +8,7 @@
   </div>
 </div>
 <script src="{{ url_for('static', filename='site.js') }}"></script>
+{% for key in heartbeats %}
+    {{ key }}: {{ heartbeats[key] }} <br/>
+{% endfor %}
 {% endblock %}

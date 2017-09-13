@@ -34,7 +34,11 @@ app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.users_awake = {}
 app.dummy_alerts = {}
-app.last_time_shifthelper_online = None
+app.heartbeats = {
+    # on startup we pretend, to have got a single heartbeat already.
+    'shifthelperHeartbeat': datetime.utcnow() - timedelta(minutes=9),
+    'heartbeatMonitor': datetime.utcnow() - timedelta(minutes=9),
+}
 app.config['shifthelper_log'] = config['app']['shifthelper_log']
 
 login_manager.init_app(app)
@@ -106,11 +110,7 @@ def update_clients():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    if app.last_time_shifthelper_online is None:
-        last_time_shifthelper_online_str = ""
-    else:
-        last_time_shifthelper_online_str = str(app.last_time_shifthelper_online)
-    return render_template('index.html', last_time_shifthelper_online_str=last_time_shifthelper_online_str)
+    return render_template('index.html', heartbeats=app.heartbeats)
 
 
 @app.route('/log')
@@ -275,12 +275,15 @@ def get_dummy_alert():
     return jsonify(dummy_alerts)
 
 
-@app.route('/shifthelperOnline', methods=['POST'])
-@login_required
+@app.route('/shifthelperHeartbeat', methods=['POST'])
+@basic_auth.login_required
 def update_shifthelper_online_time():
-    app.last_time_shifthelper_online = datetime.utcnow()
-    return jsonify(status='ok')
+    app.heartbeats['shifthelperHeartbeat'] = datetime.utcnow()
+    return jsonify(app.heartbeats)
 
-@app.route('/shifthelperOnline', methods=['GET'])
-def get_shifthelper_online_time():
-    return jsonify(app.last_time_shifthelper_online)
+
+@app.route('/heartbeatMonitor', methods=['POST'])
+@basic_auth.login_required
+def update_heartbeat_monitor_last_check():
+    app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
+    return jsonify(app.heartbeats)
