@@ -287,3 +287,8 @@ def update_shifthelper_online_time():
 def update_heartbeat_monitor_last_check():
     app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
     return jsonify(app.heartbeats)
+
+
+@app.route('/heartbeats')
+def get_heartbeats():
+    return jsonify(app.heartbeats)
