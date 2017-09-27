@@ -15,8 +15,6 @@ from time import sleep
 import peewee
 import eventlet
 
-import subprocess as sp
-
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database
