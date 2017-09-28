@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 {% extends "layout.html" %}
 {% block content %}
+{% for key in heartbeats %}
+    {{ key }}: {{ heartbeats[key] }} <br/>
+{% endfor %}
 <div class=container>
   <div class=content>
     <div id="alerts-panel" >
@@ -8,7 +11,4 @@
   </div>
 </div>
 <script src="{{ url_for('static', filename='site.js') }}"></script>
-{% for key in heartbeats %}
-    {{ key }}: {{ heartbeats[key] }} <br/>
-{% endfor %}
 {% endblock %}
