@@ -15,8 +15,6 @@ from time import sleep
 import peewee
 import eventlet
 
-import subprocess as sp
-
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database
@@ -34,6 +32,11 @@ app.config['user'] = config['app']['user']
 app.config['password'] = config['app']['password']
 app.users_awake = {}
 app.dummy_alerts = {}
+app.heartbeats = {
+    # on startup we pretend, to have got a single heartbeat already.
+    'shifthelperHeartbeat': datetime.utcnow() - timedelta(minutes=9),
+    'heartbeatMonitor': datetime.utcnow() - timedelta(minutes=9),
+}
 app.config['shifthelper_log'] = config['app']['shifthelper_log']
 
 login_manager.init_app(app)
@@ -105,7 +108,7 @@ def update_clients():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
+    return render_template('index.html', heartbeats=app.heartbeats)
 
 
 @app.route('/log')
@@ -254,7 +257,6 @@ def who_is_awake():
     return jsonify(users_awake)
 
 
-
 @app.route('/dummyAlert', methods=['POST'])
 @login_required
 def post_dummy_alert():
@@ -269,3 +271,22 @@ def get_dummy_alert():
         map(str, app.dummy_alerts.values())
     ))
     return jsonify(dummy_alerts)
+
+
+@app.route('/shifthelperHeartbeat', methods=['POST'])
+@basic_auth.login_required
+def update_shifthelper_online_time():
+    app.heartbeats['shifthelperHeartbeat'] = datetime.utcnow()
+    return jsonify(app.heartbeats)
+
+
+@app.route('/heartbeatMonitor', methods=['POST'])
+@basic_auth.login_required
+def update_heartbeat_monitor_last_check():
+    app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
+    return jsonify(app.heartbeats)
+
+
+@app.route('/heartbeats')
+def get_heartbeats():
+    return jsonify(app.heartbeats)

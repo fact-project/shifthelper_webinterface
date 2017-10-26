@@ -8,7 +8,8 @@ def create_mysql_engine(user, password, host, database):
     return create_engine(
         'mysql+pymysql://{user}:{password}@{host}/{database}'.format(
             user=user, password=password, host=host, database=database
-        )
+        ),
+        pool_recycle=3600,  # get rid of old connections
     )
 
 
