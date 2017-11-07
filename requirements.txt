@@ -4,3 +4,4 @@ flask_socketio
 flask_httpauth
 peewee
 requests
+eventlet

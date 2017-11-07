@@ -1,11 +1,23 @@
 <!DOCTYPE html>
 {% extends "layout.html" %}
 {% block content %}
-{% for key in heartbeats %}
-    {{ key }}: {{ heartbeats[key] }} <br/>
-{% endfor %}
+
 <div class=container>
   <div class=content>
+    <div>
+      <table>
+        <tr>
+        {% for key in heartbeats %}
+        <th>{{ key }}</th>
+        {% endfor %}
+        </tr>
+        <tr>
+        {% for key in heartbeats %}
+          <td>{{ key }}: {{ heartbeats[key] }} </td>
+        {% endfor %}
+        </tr>
+      </table>
+    </div>
     <div id="alerts-panel" >
     </div>
   </div>
