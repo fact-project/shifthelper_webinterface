@@ -109,7 +109,7 @@ var Alert = React.createClass({
       );
     } else {
       button = React.createElement(
-        "button", {"className": "btn btn-success btn-sm"}, "Done"
+        "button", {"className": "btn btn-success btn-sm btn-disabled"}, "Done"
       );
     }
     return React.createElement(
