@@ -18,6 +18,7 @@
             {% if not current_user.is_authenticated %}
             <ul class="nav navbar-nav">
               <li class="disabled"><a href="#">Logs</a></li>
+              <li><a href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a></li>
               <li class="disabled"><a href="#">Test Call</a></li>
               <li class="disabled"><a href="#">Test Telegram</a></li>
               <li class="disabled"><a href="#">I am awake</a></li>
@@ -32,6 +33,7 @@
             {% else %}
             <ul class="nav navbar-nav">
               <li><a href="/log">Logs</a></li>
+              <li><a href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a></li>
               <li><a href="/testCall">Test Call</a></li>
               <li><a href="/testTelegram">Test Telegram</a></li>
               <li>
