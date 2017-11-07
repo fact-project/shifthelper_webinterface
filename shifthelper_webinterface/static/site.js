@@ -4,6 +4,9 @@ var events = new Events();
 
 var socket = io();
 
+var params = new URLSearchParams(window.location.search);
+
+
 function convertLevelToString (level) {
   var str;
   switch(level){
@@ -52,8 +55,20 @@ var Alerts = React.createClass({
     });
   },
 
+  // filter alerts by category
+  filterCategory(element, index, array) {
+    console.log(this);
+    if (this.props.categoryFilter == "all") {
+      return true;
+    } else if (this.props.categoryFilter == "expert") {
+      return element.category == "developer" || element.category == "check_error";
+    } else {
+      return element.category == this.props.categoryFilter;
+    }
+  },
+
   render() {
-    var alertTable = this.state.alerts.map((function(_this){
+    var alertTable = this.state.alerts.filter(this.filterCategory).map((function(_this){
       return function(alert, i) {
         return React.createElement(Alert, {
           "acknowledged": alert.acknowledged,
@@ -125,10 +140,18 @@ var AlertsPanel = React.createClass({
         {"className": "panel-heading"},
         React.createElement("h3", { "className": "panel-title" }, "Current Alerts")
       ),
-      React.createElement(Alerts, null)
+      React.createElement(
+        Alerts,
+        {categoryFilter: params.get("showAlerts") || "shifter" }
+      )
     );
   }
 });
 
-
-React.render(React.createElement(AlertsPanel, null), document.getElementById('alerts-panel'));
+React.render(
+  React.createElement(
+    AlertsPanel,
+    null
+  ),
+  document.getElementById('alerts-panel')
+);
