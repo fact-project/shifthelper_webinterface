@@ -19,13 +19,15 @@
       </table>
     </div>
     <div>
-      <form action="/">
-        <select name="showAlerts">
-          <option value="shifter">Shifter</option>
-          <option value="expert">Expert</option>
-          <option value="all">All</option>
-        </select>
-        <input type="submit" value="Filter Alerts">
+      <form action="/" class="form-inline">
+        <div class="form-group">
+          <select name="showAlerts" class="form-control">
+            <option value="shifter">Shifter</option>
+            <option value="expert">Expert</option>
+            <option value="all">All</option>
+          </select>
+          <input type="submit" value="Filter Alerts" class="btn btn-default">
+        </div>
       </form>
     </div>
     <div id="alerts-panel" >
