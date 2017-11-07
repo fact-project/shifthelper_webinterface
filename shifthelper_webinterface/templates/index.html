@@ -1,11 +1,35 @@
 <!DOCTYPE html>
 {% extends "layout.html" %}
 {% block content %}
-{% for key in heartbeats %}
-    {{ key }}: {{ heartbeats[key] }} <br/>
-{% endfor %}
+
 <div class=container>
   <div class=content>
+    <div>
+      <table class="table">
+        <tr>
+        {% for key in heartbeats %}
+        <th>{{ key }}</th>
+        {% endfor %}
+        </tr>
+        <tr>
+        {% for val in heartbeats.values() %}
+          <td>{{ val }} </td>
+        {% endfor %}
+        </tr>
+      </table>
+    </div>
+    <div>
+      <form action="/" class="form-inline">
+        <div class="form-group">
+          <select onchange="this.form.submit()" type="submit" name="showAlerts" class="form-control">
+            <option value="" selected disabled hidden>Choose Alert Filter</option>
+            <option value="shifter">Shifter</option>
+            <option value="expert">Expert</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+      </form>
+    </div>
     <div id="alerts-panel" >
     </div>
   </div>

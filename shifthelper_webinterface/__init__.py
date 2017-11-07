@@ -77,7 +77,7 @@ def remove_alert(uuid):
 
 def add_alert(alert):
     alert['acknowledged'] = False
-    Alert(**alert).save()
+    Alert.insert(**alert).execute()
 
 
 def acknowledge_alert(uuid):
@@ -144,6 +144,8 @@ def get_alerts():
 @basic_auth.login_required
 def post_alert():
     alert = request.json
+    if not alert:
+        return jsonify(status="Received empty json object"), 400
     try:
         add_alert(alert)
     except peewee.InternalError as e:
