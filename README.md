@@ -6,11 +6,14 @@ The webinterface for the shifthelper
 We are using
 
 * twitter bootstrap for responsivness (make it look good on mobile)
-* react (without jsx) for the ui component
+* react (without jsx) for rendering the alert table on the client side
 * socketio for the websocket (new alerts pop up without refreshing the page)
 
 React using pure javascript avoids a more complicated compilation step but 
 results in more boilerplate code.
+See
+* https://reactjs.org/docs/introducing-jsx.html
+* https://reactjs.org/docs/react-without-jsx.html
 
 
 ## Local Testing without docker for the webinterface
