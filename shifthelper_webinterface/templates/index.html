@@ -5,15 +5,15 @@
 <div class=container>
   <div class=content>
     <div>
-      <table>
+      <table class="table">
         <tr>
         {% for key in heartbeats %}
         <th>{{ key }}</th>
         {% endfor %}
         </tr>
         <tr>
-        {% for key in heartbeats %}
-          <td>{{ key }}: {{ heartbeats[key] }} </td>
+        {% for val in heartbeats.values() %}
+          <td>{{ val }} </td>
         {% endfor %}
         </tr>
       </table>
