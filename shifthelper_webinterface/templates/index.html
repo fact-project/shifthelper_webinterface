@@ -21,12 +21,12 @@
     <div>
       <form action="/" class="form-inline">
         <div class="form-group">
-          <select name="showAlerts" class="form-control">
+          <select onchange="this.form.submit()" type="submit" name="showAlerts" class="form-control">
+            <option value="" selected disabled hidden>Choose Alert Filter</option>
             <option value="shifter">Shifter</option>
             <option value="expert">Expert</option>
             <option value="all">All</option>
           </select>
-          <input type="submit" value="Filter Alerts" class="btn btn-default">
         </div>
       </form>
     </div>
