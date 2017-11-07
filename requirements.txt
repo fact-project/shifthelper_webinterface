@@ -5,3 +5,4 @@ flask_httpauth
 peewee
 requests
 eventlet
+gunicorn

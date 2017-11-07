@@ -1,19 +1,27 @@
 # shifthelper_webinterface
 The webinterface for the shifthelper
 
+## Technology stack
 
-# how to start:
+We are using
 
- - clone
- - cd into 
+* twitter bootstrap for responsivness (make it look good on mobile)
+* react (without jsx) for the ui component
+* socketio for the websocket (new alerts pop up without refreshing the page)
 
-# 
-Build the container:
+React using pure javascript avoids a more complicated compilation step but 
+results in more boilerplate code.
+
+
+## Local Testing without docker for the webinterface
+
+Install the requirements
 ```
-$ docker build -t shifthelper_webinterface .`
+pip install -e requirements.txt
 ```
 
-Start a mysql instance for our webservice
+Start a mysql instance for the webservice,
+either setup a local mysql database or use docker with this command:
 ```
 $ docker run --restart=always \
 	-d \
@@ -24,16 +32,11 @@ $ docker run --restart=always \
 	--name=shifthelper_mysql \
 	mysql
 ```
-Start the shifthelper container
+
+Adapt the database settings in the config file to reflect your local db setup,
+then run
 
 ```
-$ docker run \
-	--restart=always \  # restart on boot
-	-d \ # run as daemon
-	-p 80:80 -p 443:443 \ # expose http and https ports
-	-v $(HOME)/shifthelper-config:/config \ # mount config path
-	-v /etc/letsencrypt:/etc/letsencrypt \  # mount letsencrypt path
-	-e SHIFTHELPER_CONFIG=/config/webservice.json \ # set config file oath
-	--link shifthelper_mysql:mysql \ # connect the mysql container to this one
-	-t shifthelper_webinterface
+export SHIFTHELPER_CONFIG=/path/to/config/json
+gunicorn -k eventlet -b 127.0.0.1:5000 shifthelper_webinterface:app
 ```
