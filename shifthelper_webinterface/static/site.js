@@ -5,6 +5,7 @@ var events = new Events();
 var socket = io();
 
 var params = new URLSearchParams(window.location.search);
+var categoryFilter = params.get("showAlerts") || "shifter";
 
 
 function convertLevelToString (level) {
@@ -138,11 +139,15 @@ var AlertsPanel = React.createClass({
       React.createElement(
         "div",
         {"className": "panel-heading"},
-        React.createElement("h3", { "className": "panel-title" }, "Current Alerts")
+        React.createElement(
+          "h3",
+          { "className": "panel-title" },
+          "Current Alerts (" + categoryFilter + ")"
+        )
       ),
       React.createElement(
         Alerts,
-        {categoryFilter: params.get("showAlerts") || "shifter" }
+        {categoryFilter: categoryFilter}
       )
     );
   }
