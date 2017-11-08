@@ -17,7 +17,7 @@ import eventlet
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
-from .database import Alert, database
+from .database import Alert, database, Shifter
 
 
 eventlet.monkey_patch()
@@ -52,7 +52,13 @@ database.init(**config['database'])
 @app.before_first_request
 def init_db():
     database.connect()
-    database.create_tables([Alert], safe=True)
+    database.create_tables([Alert, Shifter], safe=True)
+    for role in ('shifter', 'fallback', 'developer'):
+        shifter, new = Shifter.get_or_create(role=role)
+        if new:
+            shifter.name = 'unknown'
+            shifter.timestamp = datetime.now()
+        shifter.save()
     database.close()
 
 
@@ -101,6 +107,21 @@ def retrieve_alerts():
     return [alert.to_dict() for alert in alerts]
 
 
+def retrieve_shifters():
+    shifters = [
+        Shifter.get(role=role).to_dict()
+        for role in ('shifter', 'fallback', 'developer')
+    ]
+    return tuple(shifters)
+
+
+def update_shifter(role, name, timestamp):
+    shifter = Shifter.get(role=role)
+    shifter.name = name
+    shifter.timestamp = timestamp
+    shifter.save()
+
+
 def update_clients():
     alerts = retrieve_alerts()
     socket.emit('update', json.dumps(alerts))
@@ -108,7 +129,11 @@ def update_clients():
 
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template('index.html', heartbeats=app.heartbeats)
+    return render_template(
+        'index.html',
+        heartbeats=app.heartbeats,
+        shifters=retrieve_shifters(),
+    )
 
 
 @app.route('/log')
@@ -287,6 +312,25 @@ def update_shifthelper_online_time():
 def update_heartbeat_monitor_last_check():
     app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
     return jsonify(app.heartbeats)
+
+
+@app.route('/currentShifters', methods=['POST'])
+@basic_auth.login_required
+def post_current_shifters():
+    msg = request.json
+    if not msg:
+        return jsonify(status="Received empty json object"), 400
+    try:
+        shifters = json.loads(msg['text'])
+        for role in ('shifter', 'fallback', 'developer'):
+            update_shifter(role=role, **shifters[role], timestamp=msg['timestamp'])
+    except peewee.InternalError as e:
+        return jsonify(status='Could not update shifters', message=str(e)), 422
+    except KeyError as e:
+        return jsonify(status='Missing required key', message=str(e)), 400
+
+    update_clients()
+    return jsonify(status='ok')
 
 
 @app.route('/heartbeats')

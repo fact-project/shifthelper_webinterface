@@ -3,8 +3,13 @@
 {% block content %}
 <div class=container>
   <div class=content>
+
     <div id="alerts-panel"></div>
-    <div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Heartbeat Timestamps</h3>
+      </div>
       <table class="table">
         <tr>
         {% for key in heartbeats %}
@@ -18,7 +23,27 @@
         </tr>
       </table>
     </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Current Shifters</h3>
+      </div>
+      <table class="table">
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Last updated</th>
+        </tr>
+        {% for shifter in shifters %}
+        <tr>
+          <td>{{ shifter["role"] }}</td>
+          <td>{{ shifter["name"] }}</td>
+          <td>{{ shifter["timestamp"] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
+
   </div>
 </div>
 <script src="{{ url_for('static', filename='site.js') }}"></script>
