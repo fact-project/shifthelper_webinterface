@@ -4,8 +4,7 @@ var events = new Events();
 
 var socket = io();
 
-var params = new URLSearchParams(window.location.search);
-var categoryFilter = params.get("showAlerts") || "shifter";
+const e = React.createElement;
 
 
 function convertLevelToString (level) {
@@ -58,7 +57,6 @@ var Alerts = React.createClass({
 
   // filter alerts by category
   filterCategory(element, index, array) {
-    console.log(this);
     if (this.props.categoryFilter == "all") {
       return true;
     } else if (this.props.categoryFilter == "expert") {
@@ -71,7 +69,7 @@ var Alerts = React.createClass({
   render() {
     var alertTable = this.state.alerts.filter(this.filterCategory).map((function(_this){
       return function(alert, i) {
-        return React.createElement(Alert, {
+        return e(Alert, {
           "acknowledged": alert.acknowledged,
           "category": alert.category,
           "check": alert.check,
@@ -83,15 +81,16 @@ var Alerts = React.createClass({
         });
       };
     })(this));
-    return React.createElement(
+    return e(
       ReactCSSTransitionGroup,
       {
         "transitionName": "alerts",
         "component": "ul",
         "id": "alerts-table",
+        "key": alertTable == 0 ? null : alertTable[0].props.uuid,
         "className": "list-group"
       },
-      alertTable
+      alertTable,
     );
   }
 });
@@ -100,7 +99,7 @@ var Alert = React.createClass({
   render: function() {
     var button;
     if (this.props.acknowledged === false){
-      button = React.createElement(
+      button = e(
         "button",
         {
           className: "btn btn-danger btn-sm",
@@ -109,22 +108,22 @@ var Alert = React.createClass({
         "Acknowledge"
       );
     } else {
-      button = React.createElement(
+      button = e(
         "button", {"className": "btn btn-success btn-sm disabled"}, "Done"
       );
     }
-    return React.createElement(
+    return e(
       "li",
-      {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
-      React.createElement("div", {"className": "row"},
-        React.createElement(
+      {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}, key: this.props.uuid},
+      e("div", {"className": "row"},
+        e(
           "div", {"className": "col-md-3 col-xs-6 date"},
           this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
         ),
-        React.createElement("div", {"className": "col-md-2 col-xs-6 check"}, this.props.check),
-        React.createElement("div", {"className": "col-md-1 col-xs-6 level"}, this.props.level),
-        React.createElement("div", {"className": "col-md-4 col-xs-12"}, this.props.text),
-        React.createElement("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
+        e("div", {"className": "col-md-2 col-xs-6 check"}, this.props.check),
+        e("div", {"className": "col-md-1 col-xs-6 level"}, this.props.level),
+        e("div", {"className": "col-md-4 col-xs-12"}, this.props.text),
+        e("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
       )
     );
   }
@@ -132,29 +131,61 @@ var Alert = React.createClass({
 
 
 var AlertsPanel = React.createClass({
+  getInitialState: function() {
+    return {categoryFilter: "shifter"};
+  },
+  handleFilterChange: function(event) {
+    this.setState({categoryFilter: event.target.value});
+  },
   render: function() {
-    return React.createElement(
+    return e(
       "div",
       {"className": "panel panel-default"},
-      React.createElement(
+      e(
         "div",
         {"className": "panel-heading"},
-        React.createElement(
-          "h3",
-          { "className": "panel-title" },
-          "Current Alerts (" + categoryFilter + ")"
+        e(
+          'div',
+          {"className": "row"},
+          e(
+            "div",
+            {"className": "col-xs-8"},
+            e("h3", { "className": "panel-title" }, "Current Alerts")
+          ),
+          e(
+            "div",
+            {"className": "col-xs-4 text-right"},
+            e(
+              "form",
+              {"action":"/", "className": "form-inline"},
+              e(
+                "div",
+                {"className": "form-group"},
+                e(
+                  "select",
+                  {
+                    "onChange": this.handleFilterChange,
+                    "type": "submit",
+                    "name": "showAlerts",
+                    "className": "form-control",
+                    "selected": this.props.categoryFilter
+                  },
+                  e("option", {"value": "shifter"}, "Shifter"),
+                  e("option", {"value": "expert"}, "Expert"),
+                  e("option", {"value": "all"}, "All")
+                )
+              )
+            )
+          )
         )
       ),
-      React.createElement(
-        Alerts,
-        {categoryFilter: categoryFilter}
-      )
+      e(Alerts, {categoryFilter: this.state.categoryFilter})
     );
   }
 });
 
 React.render(
-  React.createElement(
+  e(
     AlertsPanel,
     null
   ),

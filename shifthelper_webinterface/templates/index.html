@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 {% extends "layout.html" %}
 {% block content %}
-
 <div class=container>
   <div class=content>
-    <div>
+
+    <div id="alerts-panel"></div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Heartbeat Timestamps</h3>
+      </div>
       <table class="table">
         <tr>
         {% for key in heartbeats %}
@@ -18,20 +23,27 @@
         </tr>
       </table>
     </div>
-    <div>
-      <form action="/" class="form-inline">
-        <div class="form-group">
-          <select onchange="this.form.submit()" type="submit" name="showAlerts" class="form-control">
-            <option value="" selected disabled hidden>Choose Alert Filter</option>
-            <option value="shifter">Shifter</option>
-            <option value="expert">Expert</option>
-            <option value="all">All</option>
-          </select>
-        </div>
-      </form>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Current Shifters</h3>
+      </div>
+      <table class="table">
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Last updated</th>
+        </tr>
+        {% for shifter in shifters %}
+        <tr>
+          <td>{{ shifter["role"] }}</td>
+          <td>{{ shifter["name"] }}</td>
+          <td>{{ shifter["timestamp"] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
     </div>
-    <div id="alerts-panel" >
-    </div>
+
   </div>
 </div>
 <script src="{{ url_for('static', filename='site.js') }}"></script>
