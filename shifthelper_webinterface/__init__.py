@@ -323,7 +323,7 @@ def post_current_shifters():
     try:
         shifters = json.loads(msg['text'])
         for role in ('shifter', 'fallback', 'developer'):
-            update_shifter(role=role, **shifters[role], timestamp=msg['timestamp'])
+            update_shifter(role=role, name=shifters[role], timestamp=msg['timestamp'])
     except peewee.InternalError as e:
         return jsonify(status='Could not update shifters', message=str(e)), 422
     except KeyError as e:
