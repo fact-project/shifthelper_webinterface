@@ -4,11 +4,14 @@
 
 <div class=container>
   <div class=content>
-    <div>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Heartbeat Timestamps</h3>
+      </div>
       <table class="table">
         <tr>
         {% for key in heartbeats %}
-        <th>{{ key }}</th>
+          <th>{{ key }}</th>
         {% endfor %}
         </tr>
         <tr>
