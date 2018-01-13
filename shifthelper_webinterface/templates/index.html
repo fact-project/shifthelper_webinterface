@@ -2,19 +2,15 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class=container>
-  <div class=content>
+<div id="app" class="container">
+  <div class="content">
     <div>
       <table class="table">
         <tr>
-        {% for key in heartbeats %}
-        <th>{{ key }}</th>
-        {% endfor %}
+          <th v-for="(value, key) in heartbeats">(( key ))</th>
         </tr>
         <tr>
-        {% for val in heartbeats.values() %}
-          <td>{{ val }} </td>
-        {% endfor %}
+          <td v-for="(value, key) in heartbeats">(( moment(value).utc().format('YYYY-MM-DD HH:mm:ss') ))</td>
         </tr>
       </table>
     </div>
@@ -34,5 +30,4 @@
     </div>
   </div>
 </div>
-<script src="{{ url_for('static', filename='site.js') }}"></script>
 {% endblock %}
