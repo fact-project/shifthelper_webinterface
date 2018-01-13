@@ -17,7 +17,7 @@ import eventlet
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
-from .database import Alert, database
+from .database import Alert, database_proxy
 
 
 eventlet.monkey_patch()
@@ -46,13 +46,21 @@ twillio_client = TwilioRestClient(**config['twilio']['client'])
 fact_database = create_mysql_engine(**config['fact_database'])
 telegram_bot = Bot(config['telegram']['bot_token'])
 
-database.init(**config['database'])
+if app.config['DEBUG']:
+    database = peewee.SqliteDatabase('webinterface.sqlite')
+else:
+    database = peewee.MySQLDatabase(**config['database'])
+
+database_proxy.initialize(database)
 
 
 @app.before_first_request
 def init_db():
+    print('connecting to db')
     database.connect()
+    print('creating tables')
     database.create_tables([Alert], safe=True)
+    print('Done')
     database.close()
 
 

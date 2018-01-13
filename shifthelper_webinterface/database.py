@@ -1,12 +1,12 @@
 from peewee import (
-    MySQLDatabase, Model,
+    Proxy, Model,
     CharField, DateTimeField, IntegerField, UUIDField, BooleanField, TextField
 )
 from playhouse.shortcuts import model_to_dict
 
 __all__ = ['Alert', 'database', 'AwakeNotification']
 
-database = MySQLDatabase(None)
+database_proxy = Proxy()
 
 
 class Alert(Model):
@@ -20,7 +20,7 @@ class Alert(Model):
     acknowledged = BooleanField()
 
     class Meta:
-        database = database
+        database = database_proxy
 
     def to_dict(self):
         d = model_to_dict(self)
@@ -34,4 +34,4 @@ class AwakeNotification(Model):
     last_awake_time = DateTimeField()
 
     class Meta:
-        database = database
+        database = database_proxy
