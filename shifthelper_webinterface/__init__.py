@@ -242,6 +242,7 @@ def test_telegram():
 @login_required
 def i_am_awake():
     app.users_awake[current_user.username] = datetime.utcnow()
+    flash('You are ready for shutdown!', 'alert-success')
     return redirect('/')
 
 
@@ -258,6 +259,7 @@ def who_is_awake():
 @login_required
 def post_dummy_alert():
     app.dummy_alerts[current_user.username] = datetime.utcnow()
+    flash('Dummy alert sent!', 'alert-success')
     return redirect('/')
 
 
