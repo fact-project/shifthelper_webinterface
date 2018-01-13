@@ -1,8 +1,14 @@
 flask
+pandas
+pymysql
+sqlalchemy
+requests
 flask_login
+flask_ldap3_login
 flask_socketio
+twilio==5.7.0
+telepot
 flask_httpauth
 peewee
-requests
 eventlet
 gunicorn
