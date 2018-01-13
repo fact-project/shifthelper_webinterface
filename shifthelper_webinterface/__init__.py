@@ -85,7 +85,9 @@ def add_alert(alert):
 
 
 def acknowledge_alert(uuid):
-    Alert.update(acknowledged=True).where(Alert.uuid == uuid).execute()
+    print('acknowledge_alert', uuid)
+    res = Alert.update(acknowledged=True).where(Alert.uuid == uuid).execute()
+    print(res)
 
 
 def retrieve_alerts():
@@ -155,7 +157,7 @@ def update_alert(uuid):
     if request.method == 'PUT':
         try:
             acknowledge_alert(uuid)
-            socket.emit('updateAlert')
+            socket.emit('updateAlerts')
             return jsonify(status='ok')
         except Alert.DoesNotExist:
             return jsonify(status='No such alert'), 404
@@ -164,7 +166,7 @@ def update_alert(uuid):
         try:
             uuid = request.args['uuid']
             remove_alert(uuid)
-            socket.emit('updateAlert')
+            socket.emit('updateAlerts')
         except KeyError:
             return jsonify(status='No such alert'), 404
 

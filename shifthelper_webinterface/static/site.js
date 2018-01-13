@@ -38,8 +38,6 @@ app = new Vue({
     },
     getHeartbeats: function() {
       $.getJSON('/heartbeats', (heartbeats) => {
-        console.log(heartbeats);
-        console.log(this);
         this.heartbeats = heartbeats;
       });
     },
@@ -52,6 +50,19 @@ app = new Vue({
           }
       });
     },
+  },
+  computed: {
+    filteredAlerts: function() {
+      return this.alerts.filter((alert) => {
+        if (this.categoryFilter == "all") {
+        return true;
+        } else if (this.categoryFilter == "expert") {
+          return alert.category == "developer" || alert.category == "check_error";
+        } else {
+          return alert.category == this.categoryFilter;
+        }
+      })
+    }
   }
 })
 

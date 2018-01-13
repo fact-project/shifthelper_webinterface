@@ -14,19 +14,51 @@
         </tr>
       </table>
     </div>
-    <div>
-      <form action="/" class="form-inline">
-        <div class="form-group">
-          <select onchange="this.form.submit()" type="submit" name="showAlerts" class="form-control">
-            <option value="" selected disabled hidden>Choose Alert Filter</option>
-            <option value="shifter">Shifter</option>
-            <option value="expert">Expert</option>
-            <option value="all">All</option>
-          </select>
+    <div id="alerts-panel" class="card">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-12 col-sm-6">
+            <h3 class="card-title">
+              Current Alerts
+            </h3>
+          </div>
+          <div class="col-12 col-sm-6">
+            <form class="form-inline float-sm-right">
+            <select v-model="categoryFilter" class="form-control form-control-sm">
+              <option value="shifter" selected>Shifter</option>
+              <option value="expert">Expert</option>
+              <option value="all">All</option>
+            </select>
+            </form>
+          </div>
         </div>
-      </form>
-    </div>
-    <div id="alerts-panel" >
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" v-for="alert in filteredAlerts">
+          <div class="row">
+            <div class="col-8 col-md-4 col-lg-2 date">
+              (( moment(alert.timestamp).utc().format("YYYY-MM-DD HH:mm:ss") ))
+            </div> 
+            <div class="col-4 col-md-4 col-lg-2 level">
+              (( convertLevelToString(alert.level) ))
+            </div>
+            <div class="col-12 col-md-12 col-lg-4">
+              (( alert.text ))
+            </div>
+            <div class="col-8 col-md-6 col-lg-3 check">
+              (( alert.check ))
+            </div> 
+            <div class="col-4 col-md-6 col-lg-1" >
+              <button class="btn btn-sm btn-danger float-right" type="button" @click="acknowledgeAlert(alert.uuid)" v-if="!alert.acknowledged">
+                Got it!
+              </button>
+              <button disabled class="disabled btn btn-sm btn-success float-right" type="button" v-else>
+                done
+              </button>
+            </div>
+          </div>
+        </li> 
+      </ul>
     </div>
   </div>
 </div>
