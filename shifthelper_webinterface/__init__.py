@@ -272,7 +272,7 @@ def get_dummy_alert():
 def update_shifthelper_online_time():
     app.heartbeats['shifthelperHeartbeat'] = datetime.utcnow()
     socket.emit('updateHeartbeats')
-    return jsonify(message='success')
+    return jsonify(app.heartbeats)
 
 
 @app.route('/heartbeatMonitor', methods=['POST'])
@@ -280,7 +280,7 @@ def update_shifthelper_online_time():
 def update_heartbeat_monitor_last_check():
     app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
     socket.emit('updateHeartbeats')
-    return jsonify(message='success')
+    return jsonify(app.heartbeats)
 
 
 @app.route('/heartbeats')
