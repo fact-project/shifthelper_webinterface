@@ -56,7 +56,7 @@ app = new Vue({
       for (var key in this.heartbeats) {
         ts = moment(this.heartbeats[key]).utc();
         diff = moment().utc().diff(ts.utc());
-        this.heartbeatOutdated[key] = diff > (1000 * 60 * 1);
+        this.heartbeatOutdated[key] = diff > (1000 * 60 * 5);
       }
     }
   },
