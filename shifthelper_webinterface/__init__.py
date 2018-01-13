@@ -56,11 +56,8 @@ database_proxy.initialize(database)
 
 @app.before_first_request
 def init_db():
-    print('connecting to db')
     database.connect()
-    print('creating tables')
     database.create_tables([Alert], safe=True)
-    print('Done')
     database.close()
 
 
@@ -85,9 +82,7 @@ def add_alert(alert):
 
 
 def acknowledge_alert(uuid):
-    print('acknowledge_alert', uuid)
-    res = Alert.update(acknowledged=True).where(Alert.uuid == uuid).execute()
-    print(res)
+    Alert.update(acknowledged=True).where(Alert.uuid == uuid).execute()
 
 
 def retrieve_alerts():
