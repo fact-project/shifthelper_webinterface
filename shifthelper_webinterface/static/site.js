@@ -29,7 +29,8 @@ app = new Vue({
   data: {
     msg: 'Hello World',
     alerts: [],
-    heartbeats: {'shifthelperHeartbeat': '', 'heartbeatMonitor': ''},
+    heartbeats: {'shifthelperHeartbeat': 0, 'heartbeatMonitor': 0},
+    heartbeatOutdated: {'shifthelperHeartbeat': true, 'heartbeatMonitor': true},
     categoryFilter: 'shifter'
   },
   methods: {
@@ -39,6 +40,7 @@ app = new Vue({
     getHeartbeats: function() {
       $.getJSON('/heartbeats', (heartbeats) => {
         this.heartbeats = heartbeats;
+        this.checkHeartbeatOutdated();
       });
     },
     acknowledgeAlert: function(uuid) {
@@ -50,6 +52,14 @@ app = new Vue({
           }
       });
     },
+    checkHeartbeatOutdated: function() {
+      for (var key in this.heartbeats) {
+        ts = moment(this.heartbeats[key]).utc();
+        diff = moment().utc().diff(ts.utc());
+        this.heartbeatOutdated[key] = diff > (1000 * 60 * 1);
+      }
+      console.log(Object.assign({}, this.heartbeatOutdated));
+    }
   },
   computed: {
     filteredAlerts: function() {
@@ -61,8 +71,12 @@ app = new Vue({
         } else {
           return alert.category == this.categoryFilter;
         }
-      })
+      });
     }
+  },
+  mounted: function() {
+    this.checkHeartbeatOutdated();
+    setInterval(this.checkHeartbeatOutdated, 10000);
   }
 })
 
