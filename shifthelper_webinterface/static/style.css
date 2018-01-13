@@ -43,3 +43,11 @@ nav .btn {
 div .card {
   margin-bottom: 15px;
 }
+
+.narrow {
+  padding: 5px;
+}
+
+h3.card-title {
+  margin-bottom: 0px;
+}

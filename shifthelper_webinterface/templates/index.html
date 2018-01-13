@@ -2,18 +2,21 @@
 {% extends "layout.html" %}
 {% block content %}
 
+
 <div id="app" class="container">
   <div class="content">
     <div class="row">
       <div class="col-12 col-sm-6" v-for="(value, key) in heartbeats">
         <div class="card">
-          <div class="card-header">(( key ))</div>
-          <div class="card-body">
+          <div class="card-header narrow">(( key ))</div>
+          <div class="card-body narrow inline">
             (( moment(value).utc().format('YYYY-MM-DD HH:mm:ss') ))
             <span class="text-danger" v-if="heartbeatOutdated[key]">
-              <b>&#x274c;</b>
+              <span class="fa fa-times-circle fa-lg"></span>
             </span>
-            <span class="text-success" v-else><b>&#x2713;</b></span>
+            <span class="text-success" v-else>
+              <span class="fa fa-check-circle fa-lg"></span>
+            </span>
           </div>
         </div>
       </div>
