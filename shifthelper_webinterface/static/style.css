@@ -31,3 +31,11 @@ body {
 .level {
   font-weight: bold;
 }
+
+.disabled {
+  cursor: not-allowed;
+}
+
+nav .btn {
+  margin: 5px;
+}

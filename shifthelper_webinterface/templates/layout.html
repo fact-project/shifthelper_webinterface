@@ -3,67 +3,71 @@
   {% include 'head.html' %}
   <body>
     <header>
-      <nav class="navbar navbar-default">
-        <div class="container-fluid">
-          <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          {% if not current_user.is_authenticated %}
+          <ul class="nav navbar-nav">
+            <li class="nav-item"><a class="nav-link disabled" href="#">Logs</a></li>
+            <li class="nav-item"><a class="nav-link" href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a></li>
+          </ul>
+          <button disabled type="button" class="disabled btn btn-sm btn-outline-secondary">
+            Test Call
+          </button>
+          <button disabled type="button" class="disabled btn btn-sm btn-outline-secondary">
+            Test Telegram
+          </button>
+          <button disabled type="button" class="disabled btn btn-sm btn-outline-secondary">
+            Ready for shutdown!
+          </button>
+          <form method="POST" action="/login" class="form-inline">
+            <div class="form-group">
+              <input id="username" class="form-control form-control-sm" name="username" type="text" value placeholder="username">
+              <input id="password" class="form-control form-control-sm" name="password" type="password" value placeholder="password">
+            </div>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">Login</button>
+          </form>
+          {% else %}
+          <ul class="nav navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="/log">Logs</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a>
+            </li>
+          </ul>
+          <a type="button" class="btn btn-sm btn-outline-secondary" href="/testCall">
+            Test Call
+          </a>
+          <a type="button" class="btn btn-sm btn-outline-secondary" href="/testTelegram">
+            Test Telegram
+          </a>
+          <form action="/iAmAwake" method="POST" class="form-inline">
+            <button class="btn btn-sm btn-outline-secondary" type="button">
+              Ready for shutdown!
             </button>
-            <a class="navbar-brand" href="/">Home</a>
-          </div>
-          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            {% if not current_user.is_authenticated %}
-            <ul class="nav navbar-nav">
-              <li class="disabled"><a href="#">Logs</a></li>
-              <li><a href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a></li>
-              <li class="disabled"><a href="#">Test Call</a></li>
-              <li class="disabled"><a href="#">Test Telegram</a></li>
-              <li class="disabled"><a href="#">I am awake</a></li>
-            </ul>
-            <form method="POST" action="/login" class="navbar-form">
-              <div class="form-group">
-                <input id="username" class="form-control" name="username" type="text" value placeholder="username">
-                <input id="password" class="form-control" name="password" type="password" value placeholder="password">
-              </div>
-              <button type="submit" class="btn btn-default">Login</button>
-            </form>
-            {% else %}
-            <ul class="nav navbar-nav">
-              <li><a href="/log">Logs</a></li>
-              <li><a href="https://fact-project.org/nightshift_guide" target="_blank">Guide</a></li>
-              <li><a href="/testCall">Test Call</a></li>
-              <li><a href="/testTelegram">Test Telegram</a></li>
-              <li>
-                <form action="/iAmAwake" method="POST" class="navbar-form">
-                  <button class="btn btn-default">
-                    I am awake
-                  </button>
-                </form>
-              </li>
-              <li>
-                <form action="/dummyAlert" method="POST" class="navbar-form">
-                  <button class="btn btn-default">
-                    Place Dummy Alert
-                  </button>
-                </form>
-              </li>
-              <li>
-                <form action="/logout" class="navbar-form">
-                  <button class="btn btn-default">
-                    Logout
-                  </button>
-                </form>
-              </li>
-            </ul>
-            <p class="navbar-text">Logged in as {{current_user.username}}</p>
-            {% endif %}
-          </div>
+          </form>
+          <form action="/dummyAlert" method="POST" class="form-inline">
+            <button class="btn btn-sm btn-outline-secondary">
+              Place Dummy Alert
+            </button>
+          </form>
+          <form action="/logout" class="form-inline">
+            <button class="btn btn-sm btn-outline-secondary">
+              Logout
+            </button>
+          </form>
+          <span class="navbar-text">Logged in as {{current_user.username}}</span>
+          {% endif %}
         </div>
       </nav>
-      <h1>FACT ShiftHelper Webinterface</h1>
+      <div class="container">
+        <h1>FACT ShiftHelper Webinterface</h1>
+      </div>
     </header>
     <div class="content">
       {% with messages = get_flashed_messages(with_categories=True) %}
