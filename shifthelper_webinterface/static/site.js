@@ -58,7 +58,6 @@ app = new Vue({
         diff = moment().utc().diff(ts.utc());
         this.heartbeatOutdated[key] = diff > (1000 * 60 * 1);
       }
-      console.log(Object.assign({}, this.heartbeatOutdated));
     }
   },
   computed: {
