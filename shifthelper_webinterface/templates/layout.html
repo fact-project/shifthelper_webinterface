@@ -2,9 +2,13 @@
 <html>
   {% include 'head.html' %}
   <body>
+    <div id="app">
     <header>
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">Home</a>
+        <div class="navbar-text d-block d-lg-none clock">
+          (( time )) UTC
+        </div>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -64,6 +68,9 @@
           <span class="navbar-text">Logged in as {{current_user.username}}</span>
           {% endif %}
         </div>
+        <div class="navbar-text d-none d-lg-block clock">
+          (( time )) UTC
+        </div>
       </nav>
       <div class="container">
         <h1>FACT ShiftHelper Webinterface</h1>
@@ -84,6 +91,7 @@
       {% endwith %}
       {% block content %}
       {% endblock %}
+    </div>
     </div>
   </body>
 </html>

@@ -27,8 +27,8 @@ app = new Vue({
   el: '#app',
   delimiters: ['((', '))'],
   data: {
-    msg: 'Hello World',
     alerts: [],
+    time: moment().utc().format('HH:mm:ss'),
     heartbeats: {'shifthelperHeartbeat': 0, 'heartbeatMonitor': 0},
     heartbeatOutdated: {'shifthelperHeartbeat': true, 'heartbeatMonitor': true},
     categoryFilter: 'shifter'
@@ -58,6 +58,9 @@ app = new Vue({
         diff = moment().utc().diff(ts.utc());
         this.heartbeatOutdated[key] = diff > (1000 * 60 * 5);
       }
+    },
+    updateClock() {
+      this.time = moment().utc().format('HH:mm:ss');
     }
   },
   computed: {
@@ -74,6 +77,8 @@ app = new Vue({
     }
   },
   mounted: function() {
+    this.updateClock();
+    setInterval(this.updateClock, 1000);
     this.checkHeartbeatOutdated();
     setInterval(this.checkHeartbeatOutdated, 10000);
   }

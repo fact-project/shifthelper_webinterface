@@ -51,3 +51,7 @@ div .card {
 h3.card-title {
   margin-bottom: 0px;
 }
+
+.clock {
+  font-family: monospace;
+}
