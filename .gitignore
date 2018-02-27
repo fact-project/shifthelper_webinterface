@@ -1,3 +1,5 @@
+logs
+*.sqlite
 *.swp
 config.json
 # Byte-compiled / optimized / DLL files

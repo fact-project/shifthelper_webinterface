@@ -10,6 +10,7 @@ def create_mysql_engine(user, password, host, database):
             user=user, password=password, host=host, database=database
         ),
         pool_recycle=3600,  # get rid of old connections
+        connect_args={'ssl': {'ssl-mode': 'preferred'}},
     )
 
 

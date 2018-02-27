@@ -1,12 +1,7 @@
-var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
-var update = React.addons.update;
-var events = new Events();
+"use strict;"
+
 
 var socket = io();
-
-var params = new URLSearchParams(window.location.search);
-var categoryFilter = params.get("showAlerts") || "shifter";
-
 
 function convertLevelToString (level) {
   var str;
@@ -21,142 +16,75 @@ function convertLevelToString (level) {
   return str;
 }
 
-var Alerts = React.createClass({
+function errorMessage(msg) {
+  div = $('<div>', {"class": 'alert alert-danger alert-dismissable'});
+  div.html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>');
+  div.append($('<strong>').text(msg));
+  return $('#alerts-panel').before(div);
+}
 
-  getInitialState: function() {
-    return {alerts: []};
+app = new Vue({
+  el: '#app',
+  delimiters: ['((', '))'],
+  data: {
+    alerts: [],
+    time: moment().utc().format('HH:mm:ss'),
+    heartbeats: {'shifthelperHeartbeat': 0, 'heartbeatMonitor': 0},
+    heartbeatOutdated: {'shifthelperHeartbeat': true, 'heartbeatMonitor': true},
+    categoryFilter: 'shifter'
   },
-
-  componentDidMount() {
-    $.getJSON('/alerts', this._updateAlerts);
-    socket.on('update', this._update);
-  },
-
-  _updateAlerts(alerts) {
-    return this.setState({alerts: alerts});
-  },
-
-  _update(data) {
-    var alerts = JSON.parse(data);
-    return this.setState({alerts: alerts});
-  },
-
-  acknowledgeAlert(uuid) {
-    $.ajax({
-      url: "/alerts/" + uuid,
-      type: "PUT",
-      statusCode: {
-        401: function() {
-          div = $('<div>', {"class": 'alert alert-danger alert-dismissable'});
-          div.html('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>');
-          div.append($('<strong>').text('You need to login first!'));
-          return $('#alerts-panel').before(div);
-        }
+  methods: {
+    getAlerts: function() {
+      $.getJSON('/alerts', (alerts) => {this.alerts = alerts;});
+    },
+    getHeartbeats: function() {
+      $.getJSON('/heartbeats', (heartbeats) => {
+        this.heartbeats = heartbeats;
+        this.checkHeartbeatOutdated();
+      });
+    },
+    acknowledgeAlert: function(uuid) {
+      $.ajax({
+        url: "/alerts/" + uuid,
+        type: "PUT",
+        statusCode: {
+          401: () => {errorMessage('You need to login first!');}
+          }
+      });
+    },
+    checkHeartbeatOutdated: function() {
+      for (var key in this.heartbeats) {
+        ts = moment(this.heartbeats[key]).utc();
+        diff = moment().utc().diff(ts.utc());
+        this.heartbeatOutdated[key] = diff > (1000 * 60 * 5);
       }
-    });
-  },
-
-  // filter alerts by category
-  filterCategory(element, index, array) {
-    console.log(this);
-    if (this.props.categoryFilter == "all") {
-      return true;
-    } else if (this.props.categoryFilter == "expert") {
-      return element.category == "developer" || element.category == "check_error";
-    } else {
-      return element.category == this.props.categoryFilter;
+    },
+    updateClock() {
+      this.time = moment().utc().format('HH:mm:ss');
     }
   },
-
-  render() {
-    var alertTable = this.state.alerts.filter(this.filterCategory).map((function(_this){
-      return function(alert, i) {
-        return React.createElement(Alert, {
-          "acknowledged": alert.acknowledged,
-          "category": alert.category,
-          "check": alert.check,
-          "level": convertLevelToString(alert.level),
-          "text": alert.text,
-          "timestamp": moment(alert.timestamp),
-          "uuid": alert.uuid,
-          "acknowledgeAlert": _this.acknowledgeAlert.bind(_this, alert.uuid)
-        });
-      };
-    })(this));
-    return React.createElement(
-      ReactCSSTransitionGroup,
-      {
-        "transitionName": "alerts",
-        "component": "ul",
-        "id": "alerts-table",
-        "className": "list-group"
-      },
-      alertTable
-    );
-  }
-});
-
-var Alert = React.createClass({
-  render: function() {
-    var button;
-    if (this.props.acknowledged === false){
-      button = React.createElement(
-        "button",
-        {
-          className: "btn btn-danger btn-sm",
-          "onClick": this.props.acknowledgeAlert
-        },
-        "Acknowledge"
-      );
-    } else {
-      button = React.createElement(
-        "button", {"className": "btn btn-success btn-sm disabled"}, "Done"
-      );
+  computed: {
+    filteredAlerts: function() {
+      return this.alerts.filter((alert) => {
+        if (this.categoryFilter == "all") {
+        return true;
+        } else if (this.categoryFilter == "expert") {
+          return alert.category == "developer" || alert.category == "check_error";
+        } else {
+          return alert.category == this.categoryFilter;
+        }
+      });
     }
-    return React.createElement(
-      "li",
-      {"className": "list-group-item clearfix", "style": {"vertical-align": "middle"}},
-      React.createElement("div", {"className": "row"},
-        React.createElement(
-          "div", {"className": "col-md-3 col-xs-6 date"},
-          this.props.timestamp.format('YYYY-MM-DD HH:mm:ss')
-        ),
-        React.createElement("div", {"className": "col-md-2 col-xs-6 check"}, this.props.check),
-        React.createElement("div", {"className": "col-md-1 col-xs-6 level"}, this.props.level),
-        React.createElement("div", {"className": "col-md-4 col-xs-12"}, this.props.text),
-        React.createElement("div", {"className": "col-md-2 col-xs-6 text-right pull-right"}, button)
-      )
-    );
+  },
+  mounted: function() {
+    this.updateClock();
+    setInterval(this.updateClock, 1000);
+    this.checkHeartbeatOutdated();
+    setInterval(this.checkHeartbeatOutdated, 10000);
   }
-});
+})
 
-
-var AlertsPanel = React.createClass({
-  render: function() {
-    return React.createElement(
-      "div",
-      {"className": "panel panel-default"},
-      React.createElement(
-        "div",
-        {"className": "panel-heading"},
-        React.createElement(
-          "h3",
-          { "className": "panel-title" },
-          "Current Alerts (" + categoryFilter + ")"
-        )
-      ),
-      React.createElement(
-        Alerts,
-        {categoryFilter: categoryFilter}
-      )
-    );
-  }
-});
-
-React.render(
-  React.createElement(
-    AlertsPanel,
-    null
-  ),
-  document.getElementById('alerts-panel')
-);
+app.getAlerts();
+app.getHeartbeats();
+socket.on('updateAlerts', app.getAlerts);
+socket.on('updateHeartbeats', app.getHeartbeats);

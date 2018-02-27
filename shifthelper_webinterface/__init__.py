@@ -17,7 +17,7 @@ import eventlet
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
-from .database import Alert, database
+from .database import Alert, database_proxy
 
 
 eventlet.monkey_patch()
@@ -46,7 +46,12 @@ twillio_client = TwilioRestClient(**config['twilio']['client'])
 fact_database = create_mysql_engine(**config['fact_database'])
 telegram_bot = Bot(config['telegram']['bot_token'])
 
-database.init(**config['database'])
+if app.config['DEBUG']:
+    database = peewee.SqliteDatabase('webinterface.sqlite')
+else:
+    database = peewee.MySQLDatabase(**config['database'])
+
+database_proxy.initialize(database)
 
 
 @app.before_first_request
@@ -68,11 +73,7 @@ def _db_close(exc):
 
 
 def remove_alert(uuid):
-    (
-        Alert.select()
-        .where(Alert.uuid == uuid)
-        .get()
-    ).delete_instance()
+    Alert.delete().where(Alert.uuid == uuid).execute()
 
 
 def add_alert(alert):
@@ -81,13 +82,7 @@ def add_alert(alert):
 
 
 def acknowledge_alert(uuid):
-    alert = (
-        Alert.select()
-        .where(Alert.uuid == uuid)
-        .get()
-    )
-    alert.acknowledged = True
-    alert.save()
+    Alert.update(acknowledged=True).where(Alert.uuid == uuid).execute()
 
 
 def retrieve_alerts():
@@ -101,14 +96,9 @@ def retrieve_alerts():
     return [alert.to_dict() for alert in alerts]
 
 
-def update_clients():
-    alerts = retrieve_alerts()
-    socket.emit('update', json.dumps(alerts))
-
-
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return render_template('index.html', heartbeats=app.heartbeats)
+    return render_template('index.html')
 
 
 @app.route('/log')
@@ -151,7 +141,7 @@ def post_alert():
     except peewee.InternalError as e:
         return jsonify(status='Could not add alert', message=str(e)), 422
 
-    update_clients()
+    socket.emit('updateAlerts')
     return jsonify(status='ok')
 
 
@@ -162,7 +152,7 @@ def update_alert(uuid):
     if request.method == 'PUT':
         try:
             acknowledge_alert(uuid)
-            update_clients()
+            socket.emit('updateAlerts')
             return jsonify(status='ok')
         except Alert.DoesNotExist:
             return jsonify(status='No such alert'), 404
@@ -171,7 +161,7 @@ def update_alert(uuid):
         try:
             uuid = request.args['uuid']
             remove_alert(uuid)
-            update_clients()
+            socket.emit('updateAlerts')
         except KeyError:
             return jsonify(status='No such alert'), 404
 
@@ -247,6 +237,7 @@ def test_telegram():
 @login_required
 def i_am_awake():
     app.users_awake[current_user.username] = datetime.utcnow()
+    flash('You are ready for shutdown!', 'alert-success')
     return redirect('/')
 
 
@@ -263,6 +254,7 @@ def who_is_awake():
 @login_required
 def post_dummy_alert():
     app.dummy_alerts[current_user.username] = datetime.utcnow()
+    flash('Dummy alert sent!', 'alert-success')
     return redirect('/')
 
 
@@ -279,6 +271,7 @@ def get_dummy_alert():
 @basic_auth.login_required
 def update_shifthelper_online_time():
     app.heartbeats['shifthelperHeartbeat'] = datetime.utcnow()
+    socket.emit('updateHeartbeats')
     return jsonify(app.heartbeats)
 
 
@@ -286,6 +279,7 @@ def update_shifthelper_online_time():
 @basic_auth.login_required
 def update_heartbeat_monitor_last_check():
     app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
+    socket.emit('updateHeartbeats')
     return jsonify(app.heartbeats)
 
 
