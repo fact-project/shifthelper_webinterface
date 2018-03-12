@@ -130,6 +130,11 @@ def get_alerts():
     return jsonify(alerts)
 
 
+@app.route('/time', methods=['GET'])
+def get_time():
+    return jsonify({'time': datetime.utcnow().isoformat()})
+
+
 @app.route('/alerts', methods=['POST'])
 @basic_auth.login_required
 def post_alert():
