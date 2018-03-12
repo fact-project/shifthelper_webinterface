@@ -10,7 +10,7 @@
         <div class="card">
           <div class="card-header narrow">(( key ))</div>
           <div class="card-body narrow inline">
-            (( moment(value).utc().format('YYYY-MM-DD HH:mm:ss') ))
+            (( moment.utc(value).format('YYYY-MM-DD HH:mm:ss') ))
             <span class="text-danger" v-if="heartbeatOutdated[key]">
               <span class="fa fa-times-circle fa-lg"></span>
             </span>
@@ -44,7 +44,7 @@
         <li class="list-group-item" v-for="alert in filteredAlerts">
           <div class="row">
             <div class="col-8 col-md-4 col-lg-2 date">
-              (( moment(alert.timestamp).format("YYYY-MM-DD HH:mm:ss") ))
+              (( moment.utc(alert.timestamp).format("YYYY-MM-DD HH:mm:ss") ))
             </div> 
             <div class="col-4 col-md-4 col-lg-2 level">
               (( convertLevelToString(alert.level) ))
