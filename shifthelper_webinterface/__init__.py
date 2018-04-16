@@ -184,7 +184,7 @@ def login():
         return redirect(request.args.get('next', '/'))
     else:
         flash('Wrong username/password', 'alert-danger')
-        return redirect('/?next={}'.format(request.args.get('next', '')))
+        return render_template('login.html')
 
 
 @app.route('/logout', methods=['GET', 'POST'])
