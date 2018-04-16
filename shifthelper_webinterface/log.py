@@ -36,7 +36,7 @@ def build_sse(message, id_=None):
     '''
     sse = ''
     if id_ is not None:
-        sse += f'id: {id_}\n'
+        sse += 'id: {}\n'.format(id_)
     sse += 'data: ' + '\ndata: '.join(message.splitlines())
     sse += '\n\n'
     return sse
