@@ -30,9 +30,8 @@ with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
     config = json.load(f)
 
 app = Flask(__name__)
-app.secret_key = config['app']['secret_key']
-app.config['user'] = config['app']['user']
-app.config['password'] = config['app']['password']
+app.secret_key = config['app'].pop('secret_key')
+app.config.update(config['app'])
 app.users_awake = {}
 app.dummy_alerts = {}
 app.heartbeats = {
@@ -40,7 +39,6 @@ app.heartbeats = {
     'shifthelperHeartbeat': datetime.utcnow() - timedelta(minutes=9),
     'heartbeatMonitor': datetime.utcnow() - timedelta(minutes=9),
 }
-app.config['shifthelper_log'] = config['app']['shifthelper_log']
 
 login_manager.init_app(app)
 socket = SocketIO(app)
