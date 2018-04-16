@@ -2,7 +2,10 @@ import os
 from datetime import datetime, timedelta
 import json
 
-from flask import Flask, jsonify, render_template, redirect, request, flash, Markup, Response
+from flask import (
+    Flask, jsonify, render_template, redirect,
+    request, flash, Markup, Response, stream_with_context,
+)
 from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
@@ -11,13 +14,13 @@ from twilio.rest import TwilioRestClient
 from twilio.exceptions import TwilioException
 from telepot import Bot
 from telepot.exception import TelegramError
-from time import sleep
 import peewee
 import eventlet
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database_proxy
+from .log import log_generator
 
 
 eventlet.monkey_patch()
@@ -110,18 +113,11 @@ def log():
 @app.route('/logstream')
 @login_required
 def logstream():
-    def generate():
-        first = True
-        with open(app.config['shifthelper_log']) as f:
-            while True:
-                text = f.read()
-                if first:
-                    text = '\n'.join(text.splitlines()[-100:]) + '\n'
-                    first = False
-                yield text
-                sleep(1)
-
-    return Response(generate())
+    return Response(
+        stream_with_context(log_generator()),
+        mimetype='text/event-stream',
+        headers={'Cache-Control': 'no-cache'}
+    )
 
 
 @app.route('/alerts', methods=['GET'])

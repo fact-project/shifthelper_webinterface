@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 {% extends "layout.html" %}
 {% block content %}
+
 <div class=container>
   <div class=content>
-    <pre id="log"> </>
+    <pre id="log"></pre>
   </div>
 </div>
 
 <script charset="utf-8">
-    var log = document.getElementById('log')
+  "use strict";
 
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', '{{ url_for('logstream') }}');
-    xhr.send();
+  let streamURL = '{{ url_for('logstream') }}';
+  console.log(streamURL);
+  let source = new EventSource(streamURL);
 
-    window.setInterval(function(){
-      console.log(xhr.responseText)
-      log.innerHTML = xhr.responseText;
-    }, 1000)
+  source.onmessage = function(e) {
+    console.log(e.id);
+    console.log(e.data);
+    if (e.data !== '') {
+      let log = document.getElementById('log');
+      let node = document.createTextNode(e.data + '\n');
+      log.appendChild(node);
+    }
+  }
+
+  window.onbeforeunload = function () {
+    source.close();
+  }
 </script>
 {% endblock %}
 
