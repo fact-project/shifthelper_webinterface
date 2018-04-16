@@ -181,10 +181,10 @@ def login():
 
     if user is not None:
         login_user(user)
-        return redirect('/')
+        return redirect(request.args.get('next', '/'))
     else:
         flash('Wrong username/password', 'alert-danger')
-        return redirect('/')
+        return redirect('/?next={}'.format(request.args.get('next', '')))
 
 
 @app.route('/logout', methods=['GET', 'POST'])
