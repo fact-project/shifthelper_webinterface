@@ -12,12 +12,9 @@
   "use strict";
 
   let streamURL = '{{ url_for('logstream') }}';
-  console.log(streamURL);
   let source = new EventSource(streamURL);
 
   source.onmessage = function(e) {
-    console.log(e.id);
-    console.log(e.data);
     if (e.data !== '') {
       let log = document.getElementById('log');
       let node = document.createTextNode(e.data + '\n');
