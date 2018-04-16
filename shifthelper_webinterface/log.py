@@ -11,20 +11,32 @@ def get_size(f):
     return size
 
 
-def log_generator():
+def log_generator(max_size=50000):
     '''
     Generates the bodies of server sent events from the shifthelper log.
     To be used as streamed response use flask.Respone(log_generator()).
     Can handle logfile rotation by comparing the size of the file
     to the current position.
     '''
-    with open(current_app.config['shifthelper_log']) as f:
+    with open(current_app.config['shifthelper_log'], 'rb') as f:
         for i in count():
-            if f.tell() > get_size(f):
+            size = get_size(f)
+
+            # truncate to max_size
+            if i == 0 and size > max_size:
+                f.seek(-max_size, 2)
+                yield build_sse('{:*^80}'.format(
+                    'Log output truncated to {} kB'.format(max_size // 1000)
+                ), i)
+
+            if f.tell() > size:
                 f.seek(0)
-                msg = build_sse('{:*^80}'.format('file truncated '), i)
+                msg = build_sse('{:*^80}'.format(
+                    'Log file was truncated, probably log rotation'
+                ), i)
             else:
-                msg = f.read()
+                msg = f.read().decode()
+
             yield build_sse(msg, i)
             sleep(1)
 
