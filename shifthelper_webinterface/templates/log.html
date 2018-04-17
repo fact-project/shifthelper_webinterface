@@ -4,6 +4,12 @@
 
 <div class=container>
   <div class=content>
+    <div class="form-check ml-auto">
+      <input checked type="checkbox" class="form-check-input" id="autoScroll">
+      <label class="form-check-label" for="autoScroll">
+        Scroll to bottom
+      </label>
+    </div>
     <pre id="log"></pre>
   </div>
 </div>
@@ -17,8 +23,12 @@
   source.onmessage = function(e) {
     if (e.data !== '') {
       let log = document.getElementById('log');
+      let autoScroll = document.getElementById('autoScroll');
       let node = document.createTextNode(e.data + '\n');
       log.appendChild(node);
+      if ( autoScroll.checked ) {
+        log.scrollTop = log.scrollHeight;
+      }
     }
   }
 
