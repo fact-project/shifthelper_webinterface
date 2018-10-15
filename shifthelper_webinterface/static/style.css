@@ -55,3 +55,13 @@ h3.card-title {
 .clock {
   font-family: monospace;
 }
+
+pre {
+  background-color: #eeeeee;
+  padding: 5px;
+}
+
+#log {
+  height: 75vh;
+  overflow: auto;
+}
