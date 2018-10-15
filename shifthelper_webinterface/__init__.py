@@ -2,6 +2,9 @@ import os
 from datetime import datetime, timedelta
 import json
 
+import eventlet
+eventlet.monkey_patch()
+
 from flask import (
     Flask, jsonify, render_template, redirect,
     request, flash, Markup, Response, stream_with_context,
@@ -15,15 +18,11 @@ from twilio.exceptions import TwilioException
 from telepot import Bot
 from telepot.exception import TelegramError
 import peewee
-import eventlet
 
 from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database_proxy
 from .log import log_generator
-
-
-eventlet.monkey_patch()
 
 
 with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
@@ -180,7 +179,8 @@ def login():
     user = authenticate_user(username, password)
 
     if user is not None:
-        login_user(user)
+        remember = request.form.get('remember', False) == 'on'
+        login_user(user, remember=remember)
         return redirect(request.args.get('next', '/'))
     else:
         flash('Wrong username/password', 'alert-danger')
