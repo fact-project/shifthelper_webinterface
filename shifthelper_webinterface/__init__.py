@@ -13,8 +13,8 @@ from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
 
-from twilio.rest import TwilioRestClient
-from twilio.exceptions import TwilioException
+from twilio.rest import Client as TwilioRestClient
+from twilio.base.exceptions import TwilioException
 from telepot import Bot
 from telepot.exception import TelegramError
 import peewee
@@ -25,12 +25,13 @@ from .database import Alert, database_proxy
 from .log import log_generator
 
 
-with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
+with open(os.environ.get('SHIFTHELPER_WEBCONFIG', 'config.json')) as f:
     config = json.load(f)
 
 app = Flask(__name__)
 app.secret_key = config['app'].pop('secret_key')
 app.config.update(config['app'])
+app.config['SESSION_COOKIE_SECURE'] = True
 app.users_awake = {}
 app.dummy_alerts = {}
 app.heartbeats = {
@@ -42,7 +43,10 @@ app.heartbeats = {
 login_manager.init_app(app)
 socket = SocketIO(app)
 
-twillio_client = TwilioRestClient(**config['twilio']['client'])
+twillio_client = TwilioRestClient(
+    config['twilio']['client']['sid'],
+    config['twilio']['client']['token'],
+)
 fact_database = create_mysql_engine(**config['fact_database'])
 telegram_bot = Bot(config['telegram']['bot_token'])
 

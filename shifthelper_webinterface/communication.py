@@ -1,5 +1,4 @@
-import pandas as pd
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from urllib.parse import urlencode
 from flask_login import current_user
 
@@ -11,35 +10,40 @@ def create_mysql_engine(user, password, host, database):
         ),
         pool_recycle=3600,  # get rid of old connections
         connect_args={'ssl': {'ssl-mode': 'preferred'}},
+        future=True,  # use the "new" behaviour introduced in sqlalchemy 1.4
     )
 
 
 def get_telegram_id(username, database):
-    telegram_query = (
+    telegram_query = text(
         'SELECT fid9 AS telegram_id'
         ' FROM users'
         ' JOIN userfields'
         ' ON users.uid = userfields.ufid'
-        ' WHERE username = "{username}"'
+        ' WHERE username = :username'
         ' ;'
-    ).format(username=username)
+    )
 
-    with database.connect() as conn:
-        return pd.read_sql_query(telegram_query, conn).iloc[0]['telegram_id']
+    with database.begin() as conn:
+        result = conn.execute(telegram_query, {'username': username})
+        row = result.one()
+        return row._mapping["telegram_id"]
 
 
 def get_phonenumber(username, database):
-    telephone_query = (
+    telephone_query = text(
         'SELECT fid5 AS phonenumber'
         ' FROM users'
         ' JOIN userfields'
         ' ON users.uid = userfields.ufid'
-        ' WHERE username = "{username}"'
+        ' WHERE username = :username'
         ' ;'
-    ).format(username=username)
+    )
 
-    with database.connect() as conn:
-        return pd.read_sql_query(telephone_query, conn).iloc[0]['phonenumber']
+    with database.begin() as conn:
+        result = conn.execute(telephone_query, {'username': username})
+        row = result.one()
+        return row._mapping["phonenumber"]
 
 
 def build_message_url(message):
