@@ -18,6 +18,7 @@ telepot = "^12.7"
 Flask-HTTPAuth = "^4.2.0"
 peewee = "^3.14.4"
 gunicorn = {version = "^20.1.0", optional = true, extras = ["deploy"]}
+eventlet = "^0.30.2"
 
 [tool.poetry.dev-dependencies]
 
