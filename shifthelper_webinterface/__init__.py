@@ -37,9 +37,8 @@ app.json_encoder = ISODateJSONEncoder
 app.users_awake = {}
 app.dummy_alerts = {}
 app.heartbeats = {
-    # on startup we pretend, to have got a single heartbeat already.
-    'shifthelperHeartbeat': datetime.now(timezone.utc) - timedelta(minutes=9),
-    'heartbeatMonitor': datetime.now(timezone.utc) - timedelta(minutes=9),
+    'shifthelperHeartbeat': datetime.min.replace(tzinfo=timezone.utc),
+    'heartbeatMonitor': datetime.min.replace(tzinfo=timezone.utc),
 }
 
 login_manager.init_app(app)
