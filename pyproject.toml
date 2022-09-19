@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "shifthelper_webinterface"
+version = "2.3.0"
+description = "Webinterface for the FACT shifthelper"
+authors = ["Maximilian Nöthe <maximilian.noethe@tu-dortmund.de>", "Dominik Neise <neised@phys.ethz.ch>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Flask = "^1.1.2"
+PyMySQL = "^1.0.2"
+SQLAlchemy = "^1.4.12"
+requests = "^2.25.1"
+Flask-Login = "^0.5.0"
+Flask-SocketIO = "^5.0.1"
+twilio = ">=6"
+telepot = "^12.7"
+Flask-HTTPAuth = "^4.2.0"
+peewee = "^3.14.4"
+gunicorn = {version = "^20.1.0", optional = true, extras = ["deploy"]}
+eventlet = "^0.30.2"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.extras]
+deploy = ["gunicorn"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

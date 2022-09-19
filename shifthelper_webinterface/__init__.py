@@ -1,5 +1,5 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import json
 
 import eventlet
@@ -13,8 +13,8 @@ from flask_login import login_user, login_required, logout_user
 from flask_socketio import SocketIO
 from flask_login import current_user
 
-from twilio.rest import TwilioRestClient
-from twilio.exceptions import TwilioException
+from twilio.rest import Client as TwilioRestClient
+from twilio.base.exceptions import TwilioException
 from telepot import Bot
 from telepot.exception import TelegramError
 import peewee
@@ -23,26 +23,31 @@ from .authentication import login_manager, basic_auth, authenticate_user
 from .communication import create_mysql_engine, place_call, send_message
 from .database import Alert, database_proxy
 from .log import log_generator
+from .json_encoder import ISODateJSONEncoder
 
 
-with open(os.environ.get('SHIFTHELPER_CONFIG', 'config.json')) as f:
+with open(os.environ.get('SHIFTHELPER_WEBCONFIG', 'config.json')) as f:
     config = json.load(f)
 
 app = Flask(__name__)
 app.secret_key = config['app'].pop('secret_key')
 app.config.update(config['app'])
+app.config['SESSION_COOKIE_SECURE'] = True
+app.json_encoder = ISODateJSONEncoder
 app.users_awake = {}
 app.dummy_alerts = {}
 app.heartbeats = {
-    # on startup we pretend, to have got a single heartbeat already.
-    'shifthelperHeartbeat': datetime.utcnow() - timedelta(minutes=9),
-    'heartbeatMonitor': datetime.utcnow() - timedelta(minutes=9),
+    'shifthelperHeartbeat': datetime.min.replace(tzinfo=timezone.utc),
+    'heartbeatMonitor': datetime.min.replace(tzinfo=timezone.utc),
 }
 
 login_manager.init_app(app)
 socket = SocketIO(app)
 
-twillio_client = TwilioRestClient(**config['twilio']['client'])
+twillio_client = TwilioRestClient(
+    config['twilio']['client']['sid'],
+    config['twilio']['client']['token'],
+)
 fact_database = create_mysql_engine(**config['fact_database'])
 telegram_bot = Bot(config['telegram']['bot_token'])
 
@@ -230,7 +235,7 @@ def test_telegram():
 @app.route('/iAmAwake', methods=['POST'])
 @login_required
 def i_am_awake():
-    app.users_awake[current_user.username] = datetime.utcnow()
+    app.users_awake[current_user.username] = datetime.now(timezone.utc)
     flash('You are ready for shutdown!', 'alert-success')
     return redirect('/')
 
@@ -247,7 +252,7 @@ def who_is_awake():
 @app.route('/dummyAlert', methods=['POST'])
 @login_required
 def post_dummy_alert():
-    app.dummy_alerts[current_user.username] = datetime.utcnow()
+    app.dummy_alerts[current_user.username] = datetime.now(timezone.utc)
     flash('Dummy alert sent!', 'alert-success')
     return redirect('/')
 
@@ -264,7 +269,7 @@ def get_dummy_alert():
 @app.route('/shifthelperHeartbeat', methods=['POST'])
 @basic_auth.login_required
 def update_shifthelper_online_time():
-    app.heartbeats['shifthelperHeartbeat'] = datetime.utcnow()
+    app.heartbeats['shifthelperHeartbeat'] = datetime.now(timezone.utc)
     socket.emit('updateHeartbeats')
     return jsonify(app.heartbeats)
 
@@ -272,7 +277,7 @@ def update_shifthelper_online_time():
 @app.route('/heartbeatMonitor', methods=['POST'])
 @basic_auth.login_required
 def update_heartbeat_monitor_last_check():
-    app.heartbeats['heartbeatMonitor'] = datetime.utcnow()
+    app.heartbeats['heartbeatMonitor'] = datetime.now(timezone.utc)
     socket.emit('updateHeartbeats')
     return jsonify(app.heartbeats)
 
